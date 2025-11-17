@@ -8,11 +8,11 @@ const Contact = () => {
   const text = `Got a question, how or project Idea?
     I'd love to hear from you and discus further!`;
   const items = [
-    "just imagin, I code",
-    "just imagin, I code",
-    "just imagin, I code",
-    "just imagin, I code",
-    "just imagin, I code",
+    "just imagine, I code",
+    "just imagine, I code",
+    "just imagine, I code",
+    "just imagine, I code",
+    "just imagine, I code",
   ];
   useGSAP(() => {
     gsap.from(".social-link", {
@@ -40,30 +40,30 @@ const Contact = () => {
           textColor={"text-white"}
           withScrollTrigger={true}
         />
-        <div className="flex px-10 font-light text-white uppercase lg:text-[32px] text-[26px] leading-none mb-10">
-          <div className="flex flex-col w-full gap-10">
+        <div className="flex px-6 font-light text-white uppercase text-[22px] leading-tight sm:px-10 sm:text-[26px] lg:text-[32px] mb-10">
+          <div className="flex flex-col w-full gap-8">
             <div className="social-link">
               <h2>E-mail</h2>
               <div className="w-full h-px my-2 bg-white/30" />
-              <p className="text-xl tracking-wider lowercase md:text-2xl lg:text-3xl">
+              <p className="text-lg tracking-wider lowercase sm:text-xl md:text-2xl lg:text-3xl break-all">
 Luchezar.dd@protonmail.com              </p>
             </div>
             <div className="social-link">
               <h2>Phone</h2>
               <div className="w-full h-px my-2 bg-white/30" />
-              <p className="text-xl lowercase md:text-2xl lg:text-3xl">
+              <p className="text-lg lowercase sm:text-xl md:text-2xl lg:text-3xl">
                 +45 55 21 92 82
               </p>
             </div>
             <div className="social-link">
               <h2>Social Media</h2>
               <div className="w-full h-px my-2 bg-white/30" />
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 text-[11px] sm:text-xs md:text-sm">
                 {socials.map((social, index) => (
                   <a
                     key={index}
                     href={social.href}
-                    className="text-xs leading-loose tracking-wides uppercase md:text-sm hover:text-white/80 transition-colors duration-200"
+                    className="leading-loose tracking-widest uppercase hover:text-white/80 transition-colors duration-200"
                   >
                     {"{ "}
                     {social.name}

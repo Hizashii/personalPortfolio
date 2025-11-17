@@ -46,7 +46,7 @@ From idea  to deployed product 🚀`;
         textColor={"text-white"}
         withScrollTrigger={true}
       />
-      <div className="flex flex-col items-center justify-between gap-16 px-10 pb-16 text-xl font-light tracking-wide lg:flex-row md:text-2xl lg:text-3xl text-white/60">
+      <div className="flex flex-col items-center justify-between gap-10 px-6 pb-12 text-lg font-light tracking-wide sm:gap-16 sm:px-10 sm:text-xl lg:flex-row md:text-2xl lg:text-3xl text-white/60">
         {/* need to add image here */}
         <div className="w-full space-y-10">
           <AnimatedTextLines

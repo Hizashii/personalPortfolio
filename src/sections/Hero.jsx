@@ -10,10 +10,13 @@ const Hero = () => {
 unfair advantage through premium
 results driven webs/apps`;
   return (
-    <section id="home" className="flex flex-col justify-end min-h-screen">
+    <section
+      id="home"
+      className="flex flex-col justify-end min-h-screen pt-24 pb-10"
+    >
       <AnimatedHeaderSection
-        subTitle={"404 No Bugs Found"}
-        title={"Luchezar Dimitrov"}
+        subTitle={"gateway to better digital experiences"}
+        title={"Luchezar Dimchov"}
         text={text}
         textColor={"text-black"}
       />
@@ -28,7 +31,7 @@ results driven webs/apps`;
           <ambientLight intensity={0.5} />
           <Suspense fallback={null}>
             <Float speed={0.5}>
-              <Planet scale={isMobile ? 0.7 : 1} />
+              <Planet scale={isMobile ? 0.38 : 1} />
             </Float>
           </Suspense>
           <Environment resolution={256}>

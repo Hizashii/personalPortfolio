@@ -24,7 +24,7 @@ export function Planet(props) {
 
     // scale
     const maxSize = Math.max(size.x, size.y, size.z);
-    const targetSize = 3.5;
+    const targetSize = 3;
     const scale = targetSize / maxSize;
     group.scale.setScalar(scale);
 
@@ -40,14 +40,14 @@ export function Planet(props) {
 
     gsap.from(wrapperRef.current.position, {
       y: 5,
-      duration: 1.2,
+      duration: 1.4,
       ease: "power3.out",
     });
 
     gsap.from(wrapperRef.current.rotation, {
-      x: 0.2,
+      x: 0.3,
       z: -0.15,
-      duration: 1.2,
+      duration: 1.4,
       ease: "power3.out",
     });
   }, []);
