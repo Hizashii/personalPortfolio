@@ -160,11 +160,15 @@ const Works = () => {
               <img
                 src={project.bgImage}
                 alt={`${project.name}-bg-image`}
+                loading="lazy"
+                decoding="async"
                 className="object-cover w-full h-full rounded-md brightness-50"
               />
               <img
                 src={project.image}
                 alt={`${project.name}-image`}
+                loading="lazy"
+                decoding="async"
                 className="absolute bg-center px-14 rounded-xl"
               />
             </div>
@@ -179,6 +183,8 @@ const Works = () => {
     <img
       src={projects[currentIndex].image}
       alt="preview"
+      loading="eager"
+      decoding="async"
       className="object-cover w-full h-full"
     />
   )}

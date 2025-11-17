@@ -120,12 +120,21 @@ body {
   font-family: var(--font-amiamie);
 }
 
+/* Performance optimizations */
+img {
+  content-visibility: auto;
+}
+
+canvas {
+  will-change: transform;
+}
+
 @utility clip-path {
   clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
 }
 
 @utility banner-text-responsive {
-  @apply text-[clamp(40px,12vw,150px)] leading-[1.05] sm:leading-[1.1] lg:leading-[1.15];
+  @apply text-[clamp(35px,12vw,150px)] leading-[1.05] sm:leading-[1.1] lg:leading-[1.15];
 }
 
 @utility value-text-responsive {

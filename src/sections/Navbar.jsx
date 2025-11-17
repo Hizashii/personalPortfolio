@@ -67,6 +67,11 @@ useGSAP(() => {
 
 useEffect(() => {
     const handleScroll = () => {
+        // Always show burger when menu is open
+        if (isOpen) {
+            setShowBurger(true);
+            return;
+        }
         const currentScrollY = window.scrollY;
         setShowBurger(currentScrollY <= lastScrollY.current);
         lastScrollY.current = currentScrollY;
@@ -75,16 +80,19 @@ useEffect(() => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => window.removeEventListener('scroll', handleScroll);
-}, []);
+}, [isOpen]);
 const toggleMenu = () => {
     if(isOpen){
         tl.current.reverse();
         iconTl.current.reverse();
+        setIsOpen(false);
     }else{
         tl.current.play();
         iconTl.current.play();
+        setIsOpen(true);
+        // Ensure burger is visible when opening menu
+        setShowBurger(true);
     }
-    setIsOpen(!isOpen);
 }
   return (
     <>

@@ -34,7 +34,7 @@ results driven webs/apps`;
               <Planet scale={isMobile ? 0.38 : 1} />
             </Float>
           </Suspense>
-          <Environment resolution={256}>
+          <Environment resolution={isMobile ? 128 : 256}>
             <group rotation={[-Math.PI / 3, 4, 1]}>
               <Lightformer
                 form={"circle"}
