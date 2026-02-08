@@ -6,7 +6,7 @@ import Hero from './sections/Hero'
 const ServiceSummary = lazy(() => import('./sections/ServiceSummary'))
 const Services = lazy(() => import('./sections/Services'))
 const About = lazy(() => import('./sections/About'))
-const Works = lazy(() => import('./sections/Works'))
+const Projects = lazy(() => import('./sections/Projects'))
 const Contact = lazy(() => import('./sections/Contact'))
 
 const SectionLoader = () => (
@@ -30,7 +30,7 @@ const App = () => {
         <About />
       </Suspense>
       <Suspense fallback={<SectionLoader />}>
-        <Works />
+        <Projects />
       </Suspense>
       <Suspense fallback={<SectionLoader />}>
         <Contact />

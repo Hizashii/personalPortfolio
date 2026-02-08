@@ -24,12 +24,12 @@ export function Planet(props) {
 
     // scale
     const maxSize = Math.max(size.x, size.y, size.z);
-    const targetSize = 3;
+    const targetSize = 2.5;
     const scale = targetSize / maxSize;
     group.scale.setScalar(scale);
 
     // face forward
-    group.rotation.y = -Math.PI / 2;
+    group.rotation.y = Math.PI ;
 
     return group;
   }, [gltf.scene]);

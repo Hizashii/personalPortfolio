@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
-const Works = () => {
+const Projects = () => {
   const overlayRefs = useRef([]);
   const previewRef = useRef(null);
 
@@ -106,10 +106,10 @@ const Works = () => {
   };
 
   return (
-    <section id="work" className="flex flex-col min-h-screen pt-20 pb-12">
+    <section id="projects" className="flex flex-col min-h-screen pt-20 pb-12">
       <AnimatedHeaderSection
         subTitle={"Logic meets Aesthetics, Seamlessly"}
-        title={"Works"}
+        title={"Projects"}
         text={text}
         textColor={"text-black"}
         withScrollTrigger={true}
@@ -172,6 +172,7 @@ const Works = () => {
                 className="absolute bg-center px-14 rounded-xl"
               />
             </div>
+
           </div>
         ))}
         {/* desktop Flaoting preview image */}
@@ -188,7 +189,7 @@ const Works = () => {
       className="object-cover w-full h-full"
     />
   )}
-</div>  
+</div>
 </div>
 <div
   className="relative flex flex-col gap-1 py-5 cursor-default md:gap-0 px-6 sm:px-10"
@@ -213,4 +214,4 @@ const Works = () => {
   );
 };
 
-export default Works;
+export default Projects;

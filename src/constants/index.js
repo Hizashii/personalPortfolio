@@ -78,8 +78,28 @@ export const servicesData = [
     },
   ];
   export const projects = [
-    {
+        {
       id: 1,
+      name: "Invoice checker",
+      description:
+        "A simple invoice checker application with a clean, userfriendly interface.",
+        href: "https://money-mu-ruby.vercel.app/upload",
+        image: "/assets/projects/Incheck.jpg",
+      bgImage: "/assets/backgrounds/Incheck.jpg",
+      frameworks: [
+        { id: 1, name: "Next.js" },
+        { id: 2, name: "React" },
+        { id: 3, name: "TypeScript" },
+        { id: 4, name: "Tailwind CSS" },
+        { id: 5, name: "python" },
+        { id: 6, name: "unpdf" },
+        { id: 7, name: "ExcelJS " },
+        { id: 8, name: "MUI" },
+        { id: 9, name: "Geist" },
+      ],
+    },
+    {
+      id: 2,
       name: "Cinema E-commerce",
       description:
         "An online store specializing in phone accessories including cases, chargers, cables, and power banks with MagSafe compatibility.",
@@ -94,7 +114,7 @@ export const servicesData = [
       ],
     },
     {
-      id: 2,
+      id: 3,
       name: "Plant Shop E-commerce",
       description:
         "An online store specializing in rare and decorative plants with a clean, user-friendly interface.",
@@ -106,10 +126,11 @@ export const servicesData = [
         { id: 2, name: "Nuxt 3" },
         { id: 3, name: "Typescript" },
         { id: 4, name: "Tailwind CSS" },
+        { id: 5, name: "MongoDB" },
       ],
     },
     {
-      id: 3,
+      id: 4,
       name: "Travel Agency",
       description:
         "An e-commerce platform for Apple products and accessories with deals and category filtering.",
@@ -126,7 +147,7 @@ export const servicesData = [
       ],
     },
     {
-      id: 4,
+      id: 5,
       name: "Coffee shop",
       description:
         "A simple coffee shop website with a clean, user-friendly interface.",
@@ -141,7 +162,7 @@ export const servicesData = [
     },
   ];
   export const socials = [
- 
+
     { name: "LinkedIn", href: "https://www.linkedin.com/in/lachezar-dimchov-4a8b852a3" },
     { name: "GitHub", href: "https://github.com/Hizashii" },
   ];
