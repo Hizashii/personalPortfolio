@@ -102,8 +102,8 @@ export const servicesData = [
       id: 2,
       name: "Cinema E-commerce",
       description:
-        "An online store specializing in phone accessories including cases, chargers, cables, and power banks with MagSafe compatibility.",
-      href: "https://absolutecinema.ct.ws/public/frontend/index.php?i=1",
+        "A fullstack cinema portal with a user-facing app for browsing and booking movies and an admin dashboard for managing screenings, seats, and content - like a real cinema booking system.",
+      href: "https://papayawhip-llama-422273.hostingersite.com/",
       image: "/assets/projects/cinema.png",
       bgImage: "/assets/backgrounds/cinema.png",
       frameworks: [
@@ -133,7 +133,7 @@ export const servicesData = [
       id: 4,
       name: "Travel Agency",
       description:
-        "An e-commerce platform for Apple products and accessories with deals and category filtering.",
+        "A Skyscanner-style travel search app for comparing flights and travel options with a clean, fast interface and real-time search.",
       href: "https://travelio-murex.vercel.app/",
       image: "/assets/projects/travel.png",
       bgImage: "/assets/backgrounds/map.jpg",

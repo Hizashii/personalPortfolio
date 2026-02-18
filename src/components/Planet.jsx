@@ -4,9 +4,12 @@ import * as THREE from "three";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
+// Bundled with build so the deployed site always uses this file (no cache serving old model)
+import modelUrl from "../assets/Planet.glb?url";
+
 export function Planet(props) {
   const wrapperRef = useRef();
-  const gltf = useGLTF("/models/Planet.glb");
+  const gltf = useGLTF(modelUrl);
 
   const processedScene = useMemo(() => {
     if (!gltf.scene) return null;
@@ -61,4 +64,4 @@ export function Planet(props) {
   );
 }
 
-useGLTF.preload("/models/Planet.glb");
+useGLTF.preload(modelUrl);

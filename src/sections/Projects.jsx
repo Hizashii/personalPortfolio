@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import AnimatedHeaderSection from "../components/AnimatedHeaderSection";
+import ProjectDetailModal from "../components/ProjectDetailModal";
 import { projects } from "../constants";
 import { useRef, useState } from "react";
 import gsap from "gsap";
@@ -10,6 +11,7 @@ const Projects = () => {
   const previewRef = useRef(null);
 
   const [currentIndex, setCurrentIndex] = useState(null);
+  const [detailProject, setDetailProject] = useState(null);
   const text = `Featured projects that have been meticulously
     crafted with passion to drive
     results and impact.`;
@@ -105,6 +107,11 @@ const Projects = () => {
     }
   };
 
+  const handleProjectContextMenu = (e, project) => {
+    e.preventDefault();
+    setDetailProject(project);
+  };
+
   return (
     <section id="projects" className="flex flex-col min-h-screen pt-20 pb-12">
       <AnimatedHeaderSection
@@ -114,6 +121,10 @@ const Projects = () => {
         textColor={"text-black"}
         withScrollTrigger={true}
       />
+      <p className="px-6 sm:px-10 mt-2 text-xs text-black/50 flex items-center gap-1.5">
+        <Icon icon="lucide:mouse-pointer-click" className="size-3.5" />
+        Left-click to visit · Right-click for details
+      </p>
       <div
         className="relative flex flex-col font-light px-6 sm:px-10"
         onMouseMove={handleMouseMove}
@@ -126,6 +137,7 @@ const Projects = () => {
             onMouseEnter={() => handleMouseEnter(index)}
             onMouseLeave={() => handleMouseLeave(index)}
             onClick={() => handleProjectClick(project)}
+            onContextMenu={(e) => handleProjectContextMenu(e, project)}
           >
             {/* overlay */}
             <div
@@ -210,6 +222,12 @@ const Projects = () => {
   </div>
 </div>
 
+      {detailProject && (
+        <ProjectDetailModal
+          project={detailProject}
+          onClose={() => setDetailProject(null)}
+        />
+      )}
     </section>
   );
 };

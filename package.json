@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "postinstall": "node scripts/copy-model.cjs",
+    "prebuild": "node scripts/prebuild.cjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
