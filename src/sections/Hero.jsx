@@ -20,50 +20,59 @@ results driven webs/apps`;
         text={text}
         textColor={"text-black"}
       />
-      <figure
-        className="absolute inset-0 -z-50"
-        style={{ width: "100vw", height: "100vh" }}
-      >
-        <Canvas
-          shadows
-          camera={{ position: [0, 0, -10], fov: 17.5, near: 1, far: 20 }}
+      {!isMobile && (
+        <figure
+          className="absolute inset-0 -z-50"
+          style={{ width: "100vw", height: "100vh" }}
         >
-          <ambientLight intensity={0.5} />
-          <Suspense fallback={null}>
-            <Float speed={0.5}>
-              <Planet scale={isMobile ? 0.38 : 1} />
-            </Float>
-          </Suspense>
-          <Environment resolution={isMobile ? 128 : 256}>
-            <group rotation={[-Math.PI / 3, 4, 1]}>
-              <Lightformer
-                form={"circle"}
-                intensity={2}
-                position={[0, 5, -9]}
-                scale={10}
-              />
-              <Lightformer
-                form={"circle"}
-                intensity={2}
-                position={[0, 3, 1]}
-                scale={10}
-              />
-              <Lightformer
-                form={"circle"}
-                intensity={2}
-                position={[-5, -1, -1]}
-                scale={10}
-              />
-              <Lightformer
-                form={"circle"}
-                intensity={2}
-                position={[10, 1, 0]}
-                scale={16}
-              />
-            </group>
-          </Environment>
-        </Canvas>
-      </figure>
+          <Canvas
+            shadows
+            camera={{ position: [0, 0, -10], fov: 17.5, near: 1, far: 20 }}
+          >
+            <ambientLight intensity={0.5} />
+            <Suspense fallback={null}>
+              <Float speed={0.5}>
+                <Planet scale={1} />
+              </Float>
+            </Suspense>
+            <Environment resolution={256}>
+              <group rotation={[-Math.PI / 3, 4, 1]}>
+                <Lightformer
+                  form={"circle"}
+                  intensity={2}
+                  position={[0, 5, -9]}
+                  scale={10}
+                />
+                <Lightformer
+                  form={"circle"}
+                  intensity={2}
+                  position={[0, 3, 1]}
+                  scale={10}
+                />
+                <Lightformer
+                  form={"circle"}
+                  intensity={2}
+                  position={[-5, -1, -1]}
+                  scale={10}
+                />
+                <Lightformer
+                  form={"circle"}
+                  intensity={2}
+                  position={[10, 1, 0]}
+                  scale={16}
+                />
+              </group>
+            </Environment>
+          </Canvas>
+        </figure>
+      )}
+      {isMobile && (
+        <div
+          className="absolute inset-0 -z-50 bg-neutral-100"
+          style={{ width: "100vw", height: "100vh" }}
+          aria-hidden
+        />
+      )}
     </section>
   );
 };

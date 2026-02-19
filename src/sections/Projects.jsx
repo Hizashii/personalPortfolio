@@ -167,21 +167,14 @@ const Projects = () => {
                 </p>
               ))}
             </div>
-            {/* mobile preview image */}
-            <div className="relative flex items-center justify-center md:hidden h-[320px] sm:h-[400px]">
-              <img
-                src={project.bgImage}
-                alt={`${project.name}-bg-image`}
-                loading="lazy"
-                decoding="async"
-                className="object-cover w-full h-full rounded-md brightness-50"
-              />
+            {/* mobile preview image - consistent dark background for all */}
+            <div className="relative flex items-center justify-center md:hidden h-[320px] sm:h-[400px] rounded-md bg-neutral-900 overflow-hidden">
               <img
                 src={project.image}
                 alt={`${project.name}-image`}
                 loading="lazy"
                 decoding="async"
-                className="absolute bg-center px-14 rounded-xl"
+                className="object-contain max-h-full max-w-full px-6 py-4 rounded-xl"
               />
             </div>
 
