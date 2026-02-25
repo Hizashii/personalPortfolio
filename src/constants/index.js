@@ -83,7 +83,7 @@ export const servicesData = [
       name: "Invoice checker",
       description:
         "A simple invoice checker application with a clean, userfriendly interface.",
-        href: "https://money-mu-ruby.vercel.app/upload",
+        href: "https://money-mu-ruby.vercel.app",
         image: "/assets/projects/Incheck.jpg",
       bgImage: "/assets/backgrounds/Incheck.jpg",
       frameworks: [
