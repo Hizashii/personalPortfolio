@@ -1,3 +1,4 @@
+import { Icon } from "@iconify/react";
 import { socials } from "../constants";
 import { Link } from "react-scroll";
 
@@ -59,6 +60,27 @@ const Footer = () => {
             </a>
           ))}
         </div>
+      </div>
+
+      {/* Résumé */}
+      <div className="flex items-center justify-between gap-4 mb-10 px-5 py-4 border border-white/10 rounded-lg">
+        <div>
+          <p className="text-xs sm:text-sm font-light text-white uppercase tracking-wider">
+            Résumé / CV
+          </p>
+          <p className="text-[11px] font-light text-white/30 mt-1">
+            View my full background, experience & skills
+          </p>
+        </div>
+        <a
+          href="/CV/WorkingCV.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 text-xs font-light text-white uppercase tracking-wider border border-white/20 rounded hover:bg-white hover:text-black transition-colors duration-300 whitespace-nowrap"
+        >
+          Open PDF
+          <Icon icon="lucide:arrow-up-right" className="size-3.5" />
+        </a>
       </div>
 
       {/* Bottom */}
