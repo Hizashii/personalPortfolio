@@ -3,6 +3,7 @@ import AnimatedHeaderSection from "../components/AnimatedHeaderSection";
 import Marquee from "../components/Marquee";
 import { socials } from "../constants";
 import gsap from "gsap";
+import { Icon } from "@iconify/react";
 
 const Contact = () => {
   const text = `Got a question, how or project Idea?
@@ -46,7 +47,8 @@ const Contact = () => {
               <h2>E-mail</h2>
               <div className="w-full h-px my-2 bg-white/30" />
               <p className="text-lg tracking-wider lowercase sm:text-xl md:text-2xl lg:text-3xl break-all">
-Luchezar.dd@protonmail.com              </p>
+                Luchezar.dd@protonmail.com
+              </p>
             </div>
             <div className="social-link">
               <h2>Phone</h2>
@@ -71,6 +73,30 @@ Luchezar.dd@protonmail.com              </p>
                   </a>
                 ))}
               </div>
+            </div>
+            <div className="social-link">
+              <h2>RESUME</h2>
+              <div className="w-full h-px my-2 bg-white/30" />
+              <a
+                href="/CV/WorkingCV.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between py-2 cursor-pointer hover:text-white transition-colors duration-300"
+              >
+                <div className="flex items-center gap-4">
+                  <Icon
+                    icon="lucide:file-text"
+                    className="size-6 text-white/50 group-hover:text-white transition-colors duration-300"
+                  />
+                  <span className="text-lg tracking-wider uppercase sm:text-xl md:text-2xl lg:text-3xl">
+                    Download CV
+                  </span>
+                </div>
+                <Icon
+                  icon="lucide:arrow-up-right"
+                  className="size-6 text-white/30 group-hover:text-white transition-colors duration-300"
+                />
+              </a>
             </div>
           </div>
         </div>
