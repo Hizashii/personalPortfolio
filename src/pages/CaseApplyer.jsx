@@ -5,6 +5,7 @@ import { Flow, LAB_BOUNDARY, MODEL_SEAM, PIPELINE, SectionDrawing } from '../com
 import { CaseNext, CaseSection, Eyebrow, HandNote } from '../components/case'
 import { Link } from '../router'
 import { ApplyerDemo } from '../components/demos'
+import ShipPipeline from '../components/ship'
 import { useMedia } from '../hooks'
 
 const FACTS = [
@@ -55,13 +56,6 @@ const SCREENS = [
     text: 'Five steps, with your approval before anything is sent.',
     alt: 'Applyer application flow: five steps, with the CV step open',
   },
-]
-
-const SHIPS = [
-  'Build and push the Docker image',
-  'Deploy with Ansible',
-  'Test, lint and build',
-  'Container scan, dependency audit, secret scan and static analysis',
 ]
 
 const GOING = [
@@ -275,27 +269,14 @@ export default function CaseApplyer() {
         <CaseSection
           id="ships"
           n="05"
-          label="How a change ships"
+          label="Shipping"
           title="How a change ships"
-          aside={
-            <figure className="ca-ci">
-              <img
-                src="/assets/applyer/applyer-checks.webp"
-                alt="Seven passing checks: build and push Docker image, deploy via Ansible, test lint and build, container scan, dependency audit, secret scan, static analysis"
-                width="631"
-                height="330"
-                loading="lazy"
-              />
-              <figcaption className="mono">The checks on a real push, all passing.</figcaption>
-            </figure>
-          }
+          aside={<ShipPipeline />}
         >
-          <p className="ce-p">Shipping and security are part of the build. Every push runs the same path.</p>
-          <ol className="ca-ships">
-            {SHIPS.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ol>
+          <p className="ce-p">
+            Shipping and security are part of the build. Every push builds and deploys the app, then runs
+            the tests and four security scans.
+          </p>
         </CaseSection>
 
         <CaseSection

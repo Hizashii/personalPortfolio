@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Link, RouterProvider, useRouter } from './router'
 import { NAV, SOCIALS } from './data'
 import Home from './pages/Home'
-import { AboutPage } from './pages/Sections'
+import About from './pages/About'
 import Experience from './pages/Experience'
 import Work from './pages/Work'
 import Lab from './pages/Lab'
@@ -112,14 +112,14 @@ function Routes() {
     if (path === '/work') return <Work />
     if (path === '/experience') return <Experience />
     if (path === '/lab') return <Lab />
-    if (path === '/about') return <AboutPage />
+    if (path === '/about') return <About />
     return <Home />
   }, [path])
 
   // The homepage has its own warm palette; everything else keeps the current one for now.
   useEffect(() => {
     const el = document.documentElement
-    const warm = ['/', '/lab', '/work', '/experience', '/applyer', '/spisnem', '/minwin']
+    const warm = ['/', '/lab', '/work', '/experience', '/about', '/applyer', '/spisnem', '/minwin']
     if (warm.includes(path)) el.setAttribute('data-home', '')
     else el.removeAttribute('data-home')
     if (path === '/minwin') el.setAttribute('data-dark', '')

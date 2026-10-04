@@ -21,7 +21,7 @@ const ARC = [
 const ELSEWHERE = [
   ['Studying', 'PBA in Web Development, Erhvervsakademi Sydvest, until 2027'],
   ['Community', 'Member of the Danish Chamber of Commerce in Japan since February 2026'],
-  ['Languages', 'Bulgarian (native), English (C2), Japanese (C2), Danish (A2)'],
+  ['Languages', 'English, Japanese, and Danish (learning)'],
 ]
 
 function Role({ r, first }) {

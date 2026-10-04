@@ -174,7 +174,7 @@ export const ABOUT = [
 ]
 
 export const ABOUT_META =
-  'Elsewhere: studying for a PBA in Web Development at Erhvervsakademi Sydvest, until 2027. Member of the Danish Chamber of Commerce in Japan since Feb 2026. Languages: Bulgarian (native), English (C2), Japanese (C2), Danish (A2).'
+  'Elsewhere: studying for a PBA in Web Development at Erhvervsakademi Sydvest, until 2027. Member of the Danish Chamber of Commerce in Japan since Feb 2026. Languages: English, Japanese, Danish (learning).'
 
 export const TICKER = [
   'Usually building something',
