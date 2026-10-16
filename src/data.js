@@ -163,3 +163,37 @@ export const TICKER = [
   'Writing code most days',
   'Curious about what happens after localhost',
 ]
+
+// Product screenshots, shared by previews and case studies. Sizes are the real file dimensions.
+export const SCREENSHOTS = {
+  applyerJobs: {
+    src: '/assets/applyer/applyer-jobs.webp',
+    alt: 'Applyer: a job card with a match score and apply actions',
+    width: 1546,
+    height: 966,
+  },
+  applyerApplications: {
+    src: '/assets/applyer/applyer-applications.webp',
+    alt: 'Applyer: the applications list and their status',
+    width: 1326,
+    height: 1200,
+  },
+  spisnemDashboard: {
+    src: '/assets/spisnem/spisnem-dashboard.webp',
+    alt: 'SpisNem: the restaurant dashboard with the waiting list',
+    width: 1116,
+    height: 654,
+  },
+  spisnemDiscover: {
+    src: '/assets/spisnem/spisnem-discover.webp',
+    alt: 'SpisNem: a map of nearby restaurants with live wait times',
+    width: 312,
+    height: 640,
+  },
+  spisnemQueue: {
+    src: '/assets/spisnem/spisnem-queue.webp',
+    alt: "SpisNem: a guest's place in the queue",
+    width: 256,
+    height: 500,
+  },
+}

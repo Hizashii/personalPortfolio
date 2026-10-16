@@ -1,7 +1,7 @@
 import { Arrow, Marker, Tags } from '../components/ui'
 import { AttackGraph } from '../components/demos'
 import { Link } from '../router'
-import { PROJECTS, SOCIALS } from '../data'
+import { PROJECTS, SCREENSHOTS, SOCIALS } from '../data'
 
 // `accent` places the fuji cut that sits behind each preview, so the three rows don't repeat.
 const FEATURED = [
@@ -171,16 +171,7 @@ function SectionHeader({ n, label, id, link, children }) {
 /* Selected work ---------------------------------------------------------- */
 
 function ApplyerPreview() {
-  return (
-    <img
-      src="/assets/applyer/applyer-jobs.webp"
-      alt="Applyer: a job card with a match score and apply actions"
-      width="1546"
-      height="966"
-      loading="lazy"
-      className="block h-auto w-full border border-ai/15"
-    />
-  )
+  return <img {...SCREENSHOTS.applyerJobs} loading="lazy" className="block h-auto w-full border border-ai/15" />
 }
 
 function SpectrePreview() {
@@ -195,22 +186,8 @@ function SpisnemPreview() {
   const phone = 'w-1/3 rounded-3xl border-4 border-ai bg-ai'
   return (
     <div className="flex aspect-preview items-start justify-center gap-6 overflow-hidden bg-ai/5 pt-8 sm:gap-10 sm:pt-12">
-      <img
-        src="/assets/spisnem/spisnem-discover.webp"
-        alt="SpisNem: a map of nearby restaurants with live wait times"
-        width="312"
-        height="640"
-        loading="lazy"
-        className={phone}
-      />
-      <img
-        src="/assets/spisnem/spisnem-queue.webp"
-        alt="SpisNem: a guest's place in the queue"
-        width="256"
-        height="500"
-        loading="lazy"
-        className={`${phone} translate-y-1/6`}
-      />
+      <img {...SCREENSHOTS.spisnemDiscover} loading="lazy" className={phone} />
+      <img {...SCREENSHOTS.spisnemQueue} loading="lazy" className={`${phone} translate-y-1/6`} />
     </div>
   )
 }

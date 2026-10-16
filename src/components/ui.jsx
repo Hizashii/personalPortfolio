@@ -77,6 +77,19 @@ export function Arrow({ dir = 'right', className = '' }) {
   )
 }
 
+// Top of an inner page: title on the left, the intro dropped to its baseline on the right.
+export function PageHeader({ eyebrow, title, children }) {
+  return (
+    <header className="wrap grid gap-8 pt-12 pb-section md:pt-20 lg:grid-cols-12 lg:gap-x-10 lg:pt-28">
+      <div className="lg:col-span-7">
+        <p className="text-meta font-medium text-ai-muted">{eyebrow}</p>
+        <h1 className="mt-5 text-h1 font-semibold">{title}</h1>
+      </div>
+      <div className="max-w-measure text-lede lg:col-span-5 lg:self-end">{children}</div>
+    </header>
+  )
+}
+
 // Section identifier: a numbered cut slab followed by the label.
 export function Marker({ n, children }) {
   return (
