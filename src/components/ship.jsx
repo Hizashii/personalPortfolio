@@ -10,92 +10,123 @@ const GROUPS = [
   },
 ]
 const TOTAL = GROUPS.reduce((n, g) => n + g.checks.length, 0)
+const STEP_MS = 650
 
-export default function ShipPipeline() {
-  const [done, setDone] = useState(0) // how many checks have passed
+const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Ticks checks off one by one. Starts once, when the panel scrolls into view.
+function useCheckRun() {
+  const [done, setDone] = useState(0)
   const [running, setRunning] = useState(false)
   const root = useRef(null)
   const timer = useRef(0)
-  const started = useRef(false)
 
   const run = useCallback(() => {
     clearInterval(timer.current)
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (prefersReducedMotion()) {
       setDone(TOTAL)
       return
     }
+    let n = 0
     setDone(0)
     setRunning(true)
-    let n = 0
     timer.current = setInterval(() => {
-      n += 1
-      setDone(n)
-      if (n >= TOTAL) {
-        clearInterval(timer.current)
-        setRunning(false)
-      }
-    }, 650)
+      setDone(++n)
+      if (n < TOTAL) return
+      clearInterval(timer.current)
+      setRunning(false)
+    }, STEP_MS)
   }, [])
 
-  // Start once, when the panel scrolls into view.
   useEffect(() => {
-    const el = root.current
-    if (!el) return
     const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting && !started.current) {
-          started.current = true
-          run()
-        }
+      ([entry]) => {
+        if (!entry.isIntersecting) return
+        io.disconnect()
+        run()
       },
       { threshold: 0.4 },
     )
-    io.observe(el)
+    io.observe(root.current)
     return () => {
       io.disconnect()
       clearInterval(timer.current)
     }
   }, [run])
 
-  let i = 0
+  return { root, done, running, run }
+}
+
+const STATE_LABEL = { ok: 'passed', run: 'running', wait: 'waiting' }
+
+function StatusIcon({ state }) {
+  if (state === 'ok') {
+    return (
+      <svg className="size-4 shrink-0 text-ai" viewBox="0 0 16 16" aria-hidden="true">
+        <circle cx="8" cy="8" r="8" fill="currentColor" />
+        <path d="M4.5 8.2l2.3 2.3 4.7-4.9" fill="none" stroke="var(--color-gofun)" strokeWidth="1.6" />
+      </svg>
+    )
+  }
+  const tone = state === 'run' ? 'border-ai bg-fuji motion-safe:animate-pulse' : 'border-ai/30'
+  return <span className={`size-4 shrink-0 rounded-full border-[1.5px] ${tone}`} aria-hidden="true" />
+}
+
+function CheckRow({ name, time, state }) {
   return (
-    <div className="sp" ref={root}>
-      <div className="sp-head">
-        <div>
-          <p className="sp-title">{done >= TOTAL ? 'All checks have passed' : running ? 'Running checks' : 'Checks'}</p>
-          <p className="sp-sub mono">
+    <li className="flex min-h-10 items-center gap-3 border-t border-ai/10 text-small">
+      <StatusIcon state={state} />
+      <span className={state === 'wait' ? 'text-ai-muted' : ''}>{name}</span>
+      <span className="ml-auto text-meta tabular-nums text-ai-muted">{state === 'ok' ? time : ''}</span>
+      <span className="sr-only">{STATE_LABEL[state]}</span>
+    </li>
+  )
+}
+
+function checkState(index, done, running) {
+  if (index < done) return 'ok'
+  return index === done && running ? 'run' : 'wait'
+}
+
+function CheckGroups({ done, running }) {
+  let index = 0
+  return GROUPS.map((group) => (
+    <section key={group.name} className="mt-6">
+      <h3 className="text-meta font-semibold text-ai-muted">{group.name}</h3>
+      <ul className="mt-2">
+        {group.checks.map(([name, time]) => (
+          <CheckRow key={name} name={name} time={time} state={checkState(index++, done, running)} />
+        ))}
+      </ul>
+    </section>
+  ))
+}
+
+function summary(done, running) {
+  if (done >= TOTAL) return 'All checks have passed'
+  return running ? 'Running checks' : 'Checks'
+}
+
+export default function ShipPipeline() {
+  const { root, done, running, run } = useCheckRun()
+  return (
+    <div ref={root} className="border border-ai/15 p-5 sm:p-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div aria-live="polite">
+          <p className="font-semibold">{summary(done, running)}</p>
+          <p className="text-meta tabular-nums text-ai-muted">
             {done} of {TOTAL} successful
           </p>
         </div>
-        <button type="button" className="sp-rerun" onClick={run} disabled={running}>
+        <button type="button" className="btn btn-secondary min-h-10 px-4 py-2" onClick={run} disabled={running}>
           {running ? 'Running' : 'Run again'}
         </button>
       </div>
-      <div className="sp-bar" aria-hidden="true">
-        <i style={{ width: `${(done / TOTAL) * 100}%` }} />
+      <div className="mt-5 h-1 bg-ai/10" aria-hidden="true">
+        <div className="h-full bg-ai transition-[width] duration-500 ease-cut" style={{ width: `${(done / TOTAL) * 100}%` }} />
       </div>
-      <div className="sp-groups" role="list" aria-live="polite">
-        {GROUPS.map((g) => (
-          <section key={g.name} className="sp-group" role="listitem">
-            <h3 className="mono">{g.name}</h3>
-            <ul>
-              {g.checks.map(([name, time]) => {
-                const idx = i++
-                const state = idx < done ? 'ok' : idx === done && running ? 'run' : 'wait'
-                return (
-                  <li key={name} className={`is-${state}`}>
-                    <span className="sp-ico" aria-hidden="true" />
-                    <span className="sp-name">{name}</span>
-                    <span className="sp-time mono">{state === 'ok' ? time : state === 'run' ? '...' : ''}</span>
-                    <span className="sr-only">{state === 'ok' ? 'passed' : state === 'run' ? 'running' : 'waiting'}</span>
-                  </li>
-                )
-              })}
-            </ul>
-          </section>
-        ))}
-      </div>
-      <p className="sp-fine mono">Every push runs this path. Real check names and timings from Applyer.</p>
+      <CheckGroups done={done} running={running} />
+      <p className="mt-6 text-meta text-ai-muted">Every push runs this path. Real check names and timings from Applyer.</p>
     </div>
   )
 }

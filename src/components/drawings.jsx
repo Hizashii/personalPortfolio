@@ -112,6 +112,54 @@ function edgeGeometry(a, b) {
   return { d: round([[acx, y1], [acx, my], [bcx, my], [bcx, y2]]), lx: bcx + 6, ly: y2 - 8, anchor: 'start' }
 }
 
+function ArrowMarkers() {
+  return (
+    <defs>
+      <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0 0 L8 4 L0 8 z" className="d-arrow" />
+      </marker>
+      <marker id="arr-red" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M0 0 L8 4 L0 8 z" className="d-arrow d-arrow-red" />
+      </marker>
+    </defs>
+  )
+}
+
+function Frame({ f }) {
+  return (
+    <g>
+      <rect className="d-frame" x={f.x} y={f.y} width={f.w} height={f.h} rx="12" />
+      <text className="d-sub d-frame-label" x={f.x + 10} y={f.y + 16}>
+        {f.t}
+      </text>
+    </g>
+  )
+}
+
+// Solid edges draw in on scroll, so they measure themselves as length 1. Dashed edges keep real
+// units, since a dash pattern would otherwise be scaled to the whole path.
+function Edge({ e, g, i }) {
+  const cls = ['d-edge', e.red && 'd-edge-red', e.dash ? 'd-dash-edge' : 'flow-edge'].filter(Boolean).join(' ')
+  return (
+    <g>
+      <path
+        d={g.d}
+        pathLength={e.dash ? undefined : 1}
+        className={cls}
+        style={{ '--i': i }}
+        markerEnd={e.red ? 'url(#arr-red)' : 'url(#arr)'}
+      />
+      {e.t && (
+        <text className={`d-sub d-edge-label ${e.red ? 'is-red' : ''}`} x={g.lx} y={g.ly} textAnchor={g.anchor}>
+          {e.t}
+        </text>
+      )}
+    </g>
+  )
+}
+
+const focusState = (focus, id) => (focus.length ? (focus.includes(id) ? 'is-focus' : 'is-dim') : '')
+
 export function Flow({ spec, label, dark = false, focus = [] }) {
   const ref = useDrawn()
   const byId = Object.fromEntries(spec.nodes.map((n) => [n.id, n]))
@@ -124,44 +172,15 @@ export function Flow({ spec, label, dark = false, focus = [] }) {
       aria-label={label}
       preserveAspectRatio="xMidYMid meet"
     >
-      <defs>
-        <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0 0 L8 4 L0 8 z" className="d-arrow" />
-        </marker>
-        <marker id="arr-red" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0 0 L8 4 L0 8 z" className="d-arrow d-arrow-red" />
-        </marker>
-      </defs>
+      <ArrowMarkers />
       {(spec.frames || []).map((f) => (
-        <g key={f.t}>
-          <rect className="d-frame" x={f.x} y={f.y} width={f.w} height={f.h} rx="12" />
-          <text className="d-sub d-frame-label" x={f.x + 10} y={f.y + 16}>
-            {f.t}
-          </text>
-        </g>
+        <Frame key={f.t} f={f} />
       ))}
-      {spec.edges.map((e, i) => {
-        const g = edgeGeometry(byId[e.a], byId[e.b])
-        return (
-          <g key={i}>
-            <path
-              d={g.d}
-              pathLength="1"
-              className={`d-edge flow-edge ${e.red ? 'd-edge-red' : ''} ${e.dash ? 'd-dash-edge' : ''}`}
-              style={{ '--i': i }}
-              markerEnd={e.red ? 'url(#arr-red)' : 'url(#arr)'}
-            />
-            {!e.dash && <path d={g.d} className={`flow-pulse ${e.red ? 'is-red' : ''}`} />}
-            {e.t && (
-              <text className={`d-sub d-edge-label ${e.red ? 'is-red' : ''}`} x={g.lx} y={g.ly} textAnchor={g.anchor}>
-                {e.t}
-              </text>
-            )}
-          </g>
-        )
-      })}
+      {spec.edges.map((e, i) => (
+        <Edge key={i} e={e} g={edgeGeometry(byId[e.a], byId[e.b])} i={i} />
+      ))}
       {spec.nodes.map((n, i) => (
-        <Node key={n.id} n={n} i={i} state={focus.length ? (focus.includes(n.id) ? 'is-focus' : 'is-dim') : ''} />
+        <Node key={n.id} n={n} i={i} state={focusState(focus, n.id)} />
       ))}
     </svg>
   )
@@ -259,9 +278,9 @@ export const MODEL_SEAM = {
     W: 736,
     H: 150,
     nodes: [
-      { id: 'agent', t: 'Agent', s: 'asks for an answer', x: 0, y: 52, w: 140, h: 46 },
-      { id: 'seam', t: 'Model interface', s: 'one contract', x: 228, y: 52, w: 160, h: 46, red: true },
-      { id: 'gemini', t: 'Gemini 2.5 Flash', s: 'today', x: 520, y: 4, w: 160, h: 46 },
+      { id: 'agent', t: 'Caller', s: 'asks for an answer', x: 0, y: 52, w: 140, h: 46 },
+      { id: 'seam', t: 'AI client', s: 'one contract', x: 228, y: 52, w: 160, h: 46, red: true },
+      { id: 'gemini', t: 'Gemini models', s: 'tried in order', x: 520, y: 4, w: 160, h: 46 },
       { id: 'local', t: 'Local model', s: 'in training', x: 520, y: 104, w: 160, h: 46, dash: true, cloud: true },
     ],
     edges: [
@@ -274,9 +293,9 @@ export const MODEL_SEAM = {
     W: 340,
     H: 290,
     nodes: [
-      { id: 'agent', t: 'Agent', s: 'asks for an answer', x: 90, y: 8, w: 160, h: 46 },
-      { id: 'seam', t: 'Model interface', s: 'one contract', x: 90, y: 84, w: 160, h: 46, red: true },
-      { id: 'gemini', t: 'Gemini 2.5 Flash', s: 'today', x: 8, y: 196, w: 150, h: 46 },
+      { id: 'agent', t: 'Caller', s: 'asks for an answer', x: 90, y: 8, w: 160, h: 46 },
+      { id: 'seam', t: 'AI client', s: 'one contract', x: 90, y: 84, w: 160, h: 46, red: true },
+      { id: 'gemini', t: 'Gemini models', s: 'tried in order', x: 8, y: 196, w: 150, h: 46 },
       { id: 'local', t: 'Local model', s: 'in training', x: 182, y: 196, w: 150, h: 46, dash: true, cloud: true },
     ],
     edges: [
@@ -322,6 +341,35 @@ export const LAB_BOUNDARY = {
       { a: 'model', b: 'agents', dash: true },
       { a: 'agents', b: 'gateway', dash: true },
       { a: 'gateway', b: 'out', dash: true, red: true },
+    ],
+  },
+}
+
+export const FRAME_FLOW = {
+  wide: {
+    W: 736,
+    H: 96,
+    nodes: [
+      { id: 'browser', t: 'Candidate browser', s: 'runs the page', x: 0, y: 24, w: 168, h: 48 },
+      { id: 'frame', t: 'Apply frame', s: 'rewrites, keeps it inside', x: 284, y: 24, w: 168, h: 48, red: true },
+      { id: 'ats', t: 'Recruiting system', s: "the employer's form", x: 568, y: 24, w: 168, h: 48, ext: true },
+    ],
+    edges: [
+      { a: 'browser', b: 'frame', t: 'opens form' },
+      { a: 'frame', b: 'ats', t: 'plain HTTP' },
+    ],
+  },
+  narrow: {
+    W: 340,
+    H: 250,
+    nodes: [
+      { id: 'browser', t: 'Candidate browser', s: 'runs the page', x: 70, y: 8, w: 200, h: 46 },
+      { id: 'frame', t: 'Apply frame', s: 'rewrites, keeps it inside', x: 70, y: 100, w: 200, h: 46, red: true },
+      { id: 'ats', t: 'Recruiting system', s: "the employer's form", x: 70, y: 192, w: 200, h: 46, ext: true },
+    ],
+    edges: [
+      { a: 'browser', b: 'frame', t: 'opens form' },
+      { a: 'frame', b: 'ats', t: 'plain HTTP' },
     ],
   },
 }
@@ -403,14 +451,14 @@ export const SPECTRE_FLOW = {
 /* ---------- Applyer: layered section and UI elevation ---------- */
 
 const ROWS = [
-  { layer: 'Interface', boxes: [{ t: 'Web app', s: 'TypeScript' }] },
-  { layer: 'Application', boxes: [{ t: 'API' }, { t: 'Auth' }, { t: 'Job queue' }] },
-  { layer: 'Agents', tag: 'in progress', boxes: [{ t: 'Discover', d: 1 }, { t: 'Fill forms', d: 1 }, { t: 'Review', d: 1 }] },
-  { layer: 'Model', boxes: [{ t: 'Gemini 2.5 Flash', s: 'today' }, { t: 'Local model', s: 'in training', d: 1, cloud: 1 }] },
-  { layer: 'Data', boxes: [{ t: 'Supabase', s: 'Postgres' }, { t: 'DuckDB', s: 'job store' }] },
+  { layer: 'Interface', boxes: [{ t: 'Web app', s: 'Next.js, TypeScript' }] },
+  { layer: 'Application', boxes: [{ t: 'Route handlers' }, { t: 'Auth' }, { t: 'Apply orchestrator' }] },
+  { layer: 'Apply', boxes: [{ t: 'Preflight' }, { t: 'Apply frame' }, { t: 'Portal automation' }] },
+  { layer: 'Model', boxes: [{ t: 'Gemini models', s: 'tried in order' }, { t: 'Local model', s: 'in training', d: 1, cloud: 1 }] },
+  { layer: 'Data', boxes: [{ t: 'Supabase', s: 'Postgres, row-level security' }] },
   { layer: 'Infrastructure', boxes: [{ t: 'Oracle Cloud VM' }, { t: 'Docker' }] },
   { layer: 'Delivery', boxes: [{ t: 'Terraform' }, { t: 'Ansible' }] },
-  { layer: 'External', boxes: [{ t: 'Private jobs API', ext: 1 }] },
+  { layer: 'External', boxes: [{ t: 'National job-ad API', ext: 1 }, { t: 'Employer forms', ext: 1 }] },
 ]
 
 function layoutRows(narrow, roomy) {
@@ -428,45 +476,43 @@ function layoutRows(narrow, roomy) {
   })
 }
 
+// A vertical connector from each box to the box directly below it, when there is one.
+function RowConnectors({ row, next }) {
+  return row.boxes.map((b, k) => {
+    const cx = b.x + b.w / 2
+    const below = next.boxes.some((nb) => cx > nb.x + 8 && cx < nb.x + nb.w - 8)
+    return below ? <line key={k} className="d-edge" x1={cx} y1={b.y + b.h} x2={cx} y2={next.by} /> : null
+  })
+}
+
+function LayerRow({ row, next, narrow }) {
+  return (
+    <g>
+      <text
+        className="d-sub d-layer"
+        x={narrow ? 0 : 736}
+        y={narrow ? row.y + 11 : row.y - 6}
+        textAnchor={narrow ? 'start' : 'end'}
+      >
+        {row.layer}
+      </text>
+      {next && <RowConnectors row={row} next={next} />}
+      {row.boxes.map((b) => (
+        <Node key={b.t} n={b} />
+      ))}
+    </g>
+  )
+}
+
 export function SectionDrawing({ narrow, className = '', roomy = false }) {
   const rows = layoutRows(narrow, roomy)
   const W = narrow ? 340 : 736
   const H = narrow ? 8 + ROWS.length * (roomy ? 70 : 58) : 16 + ROWS.length * (roomy ? 66 : 52) - 2
   return (
-    <svg
-      className={`drawing ${className}`}
-      viewBox={`0 0 ${W} ${H}`}
-      aria-hidden="true"
-      preserveAspectRatio="xMidYMid meet"
-    >
-      {rows.map((row, i) => {
-        const next = rows[i + 1]
-        return (
-          <g key={row.layer}>
-            <text
-              className="d-sub d-layer"
-              x={narrow ? 0 : 736}
-              y={narrow ? row.y + 11 : row.y - 6}
-              textAnchor={narrow ? 'start' : 'end'}
-            >
-              {row.layer}
-              {row.tag ? ` · ${row.tag}` : ''}
-            </text>
-            {next &&
-              row.boxes.map((b, k) => {
-                const cx = b.x + b.w / 2
-                const hit = next.boxes.find((nb) => cx > nb.x + 8 && cx < nb.x + nb.w - 8)
-                const to = hit ? cx : null
-                return to ? (
-                  <line key={k} className="d-edge" x1={to} y1={b.y + b.h} x2={to} y2={next.by} />
-                ) : null
-              })}
-            {row.boxes.map((b) => (
-              <Node key={b.t} n={b} />
-            ))}
-          </g>
-        )
-      })}
+    <svg className={`drawing ${className}`} viewBox={`0 0 ${W} ${H}`} aria-hidden="true" preserveAspectRatio="xMidYMid meet">
+      {rows.map((row, i) => (
+        <LayerRow key={row.layer} row={row} next={rows[i + 1]} narrow={narrow} />
+      ))}
     </svg>
   )
 }

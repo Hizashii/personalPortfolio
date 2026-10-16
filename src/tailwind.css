@@ -410,3 +410,152 @@
     stroke-dashoffset: -20;
   }
 }
+
+/*
+  Diagrams (components/drawings.jsx). Ai lines on ivory; emphasis is carried by weight and a
+  fuji fill, never by a new hue. Edges draw in once, when the diagram scrolls into view.
+*/
+@layer components {
+  .drawing {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .d-box {
+    fill: var(--color-gofun);
+    stroke: var(--color-ai);
+    stroke-width: 1.25;
+  }
+  .d-box.d-red {
+    fill: var(--color-fuji);
+  }
+  .d-box.d-dash {
+    stroke-dasharray: 5 4;
+  }
+  .d-box.d-ext {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-ai) 45%, transparent);
+  }
+  .d-cloud {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-ai) 30%, transparent);
+    stroke-dasharray: 2 4;
+  }
+  .d-title {
+    fill: var(--color-ai);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .d-note,
+  .d-sub {
+    fill: var(--color-ai-muted);
+    font-size: 11px;
+  }
+  .d-layer,
+  .d-frame-label {
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .d-edge {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-ai) 50%, transparent);
+    stroke-width: 1.25;
+  }
+  .d-edge.d-edge-red {
+    stroke: var(--color-ai);
+    stroke-width: 2;
+  }
+  .d-edge.d-dash-edge {
+    stroke-dasharray: 5 4;
+  }
+  .d-arrow {
+    fill: color-mix(in oklab, var(--color-ai) 50%, transparent);
+  }
+  .d-arrow.d-arrow-red {
+    fill: var(--color-ai);
+  }
+  .d-edge-label {
+    font-weight: 500;
+  }
+  .d-sub.is-red {
+    fill: var(--color-ai);
+    font-weight: 600;
+  }
+  .d-frame {
+    fill: color-mix(in oklab, var(--color-fuji) 14%, transparent);
+    stroke: color-mix(in oklab, var(--color-ai) 35%, transparent);
+    stroke-dasharray: 5 4;
+  }
+  .d-badge circle {
+    fill: var(--color-ai);
+  }
+  .d-badge text {
+    fill: var(--color-gofun);
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .d-badge.is-red circle {
+    fill: var(--color-fuji);
+  }
+  .d-badge.is-red text {
+    fill: var(--color-ai);
+  }
+  .flow-node {
+    transition: opacity 300ms var(--ease-cut);
+  }
+  .flow-node.is-dim {
+    opacity: 0.35;
+  }
+
+  /* The same diagram on an indigo surface */
+  .drawing--dark .d-box {
+    fill: var(--color-ai);
+    stroke: var(--color-gofun);
+  }
+  .drawing--dark .d-box.d-red {
+    fill: var(--color-fuji);
+    stroke: var(--color-fuji);
+  }
+  .drawing--dark .d-box.d-red ~ .d-title,
+  .drawing--dark .d-box.d-red ~ .d-note {
+    fill: var(--color-ai);
+  }
+  .drawing--dark .d-title {
+    fill: var(--color-gofun);
+  }
+  .drawing--dark .d-note,
+  .drawing--dark .d-sub {
+    fill: color-mix(in oklab, var(--color-gofun) 75%, transparent);
+  }
+  .drawing--dark .d-edge {
+    stroke: color-mix(in oklab, var(--color-gofun) 45%, transparent);
+  }
+  .drawing--dark .d-edge.d-edge-red {
+    stroke: var(--color-fuji);
+  }
+  .drawing--dark .d-arrow {
+    fill: color-mix(in oklab, var(--color-gofun) 45%, transparent);
+  }
+  .drawing--dark .d-arrow.d-arrow-red {
+    fill: var(--color-fuji);
+  }
+  .drawing--dark .d-sub.is-red {
+    fill: var(--color-fuji);
+  }
+  .drawing--dark .flow-node.is-focus .d-box {
+    stroke: var(--color-fuji);
+    stroke-width: 2;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .js .flow-edge {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 700ms var(--ease-cut) calc(var(--i, 0) * 90ms);
+    }
+    .js .drawing.is-drawn .flow-edge {
+      stroke-dashoffset: 0;
+    }
+  }
+}
