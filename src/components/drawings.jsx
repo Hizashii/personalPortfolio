@@ -359,35 +359,43 @@ export const SPIS_FLOW = {
   },
 }
 
-export const MINWIN_FLOW = {
+export const SPECTRE_FLOW = {
   wide: {
     W: 736,
-    H: 96,
+    H: 168,
     nodes: [
-      { id: 'bench', no: 1, t: 'Benchmark', s: 'measure first', x: 0, y: 24, w: 118, h: 48, dash: true },
-      { id: 'apply', no: 2, t: 'Apply', s: 'a TOML profile', x: 206, y: 24, w: 118, h: 48, dash: true },
-      { id: 'diff', no: 3, t: 'Diff', s: 'what changed', x: 412, y: 24, w: 118, h: 48, dash: true },
-      { id: 'roll', no: 4, t: 'Rollback', s: 'every change', x: 618, y: 24, w: 118, h: 48, dash: true, red: true },
+      { id: 'web', t: 'Web app', s: 'React, renders only', x: 0, y: 24, w: 124, h: 48 },
+      { id: 'api', t: 'API', s: 'FastAPI', x: 153, y: 24, w: 124, h: 48 },
+      { id: 'services', t: 'Services', s: 'catalog, runs', x: 306, y: 24, w: 124, h: 48 },
+      { id: 'engine', t: 'Engine', s: 'pure Python', x: 459, y: 24, w: 124, h: 48, red: true },
+      { id: 'domain', t: 'Domain', s: 'scenario schema', x: 612, y: 24, w: 124, h: 48 },
+      { id: 'db', t: 'SQLite', s: 'every run, kept', x: 306, y: 112, w: 124, h: 48 },
     ],
     edges: [
-      { a: 'bench', b: 'apply', dash: true },
-      { a: 'apply', b: 'diff', dash: true },
-      { a: 'diff', b: 'roll', dash: true, red: true, t: 'undo' },
+      { a: 'web', b: 'api' },
+      { a: 'api', b: 'services' },
+      { a: 'services', b: 'engine' },
+      { a: 'engine', b: 'domain' },
+      { a: 'services', b: 'db' },
     ],
   },
   narrow: {
     W: 340,
-    H: 274,
+    H: 330,
     nodes: [
-      { id: 'bench', no: 1, t: 'Benchmark', s: 'measure first', x: 106, y: 8, w: 128, h: 46, dash: true },
-      { id: 'apply', no: 2, t: 'Apply', s: 'a TOML profile', x: 106, y: 74, w: 128, h: 46, dash: true },
-      { id: 'diff', no: 3, t: 'Diff', s: 'what changed', x: 106, y: 140, w: 128, h: 46, dash: true },
-      { id: 'roll', no: 4, t: 'Rollback', s: 'every change', x: 106, y: 206, w: 128, h: 46, dash: true, red: true },
+      { id: 'web', t: 'Web app', s: 'React, renders only', x: 20, y: 8, w: 150, h: 46 },
+      { id: 'api', t: 'API', s: 'FastAPI', x: 20, y: 74, w: 150, h: 46 },
+      { id: 'services', t: 'Services', s: 'catalog, runs', x: 20, y: 140, w: 150, h: 46 },
+      { id: 'engine', t: 'Engine', s: 'pure Python', x: 20, y: 206, w: 150, h: 46, red: true },
+      { id: 'domain', t: 'Domain', s: 'scenario schema', x: 20, y: 272, w: 150, h: 46 },
+      { id: 'db', t: 'SQLite', s: 'every run, kept', x: 200, y: 140, w: 130, h: 46 },
     ],
     edges: [
-      { a: 'bench', b: 'apply', dash: true },
-      { a: 'apply', b: 'diff', dash: true },
-      { a: 'diff', b: 'roll', dash: true, red: true, t: 'undo' },
+      { a: 'web', b: 'api' },
+      { a: 'api', b: 'services' },
+      { a: 'services', b: 'engine' },
+      { a: 'engine', b: 'domain' },
+      { a: 'services', b: 'db' },
     ],
   },
 }

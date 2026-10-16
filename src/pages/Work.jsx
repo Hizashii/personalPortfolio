@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import '@fontsource/caveat/500.css'
 import { Arrow } from '../components/ui'
+import { AttackGraph } from '../components/demos'
 import { Link } from '../router'
 import { PROJECTS } from '../data'
 
@@ -15,30 +16,30 @@ const PROJECT_ROWS = [
     note: 'AI application automation',
   },
   {
-    p: PROJECTS.spisnem,
+    p: PROJECTS.spectre,
     side: 'left',
+    desc: 'A cloud attack-path analysis tool. It shows how identities, roles, policies and credentials chain into access to sensitive data, traces every step to its evidence, and tests a fix on a copy before you trust it.',
+    chips: ['Security', 'Systems', 'Software'],
+    points: ['Attack paths with evidence for every step', 'A deterministic policy engine', 'Simulate a fix before applying it', 'Flags fixes that break legitimate access'],
+    stack: ['Python', 'FastAPI', 'Pydantic', 'SQLAlchemy', 'SQLite', 'React', 'TypeScript', 'React Flow'],
+    live: { href: PROJECTS.spectre.repo, label: 'Source on GitHub' },
+    note: 'Every step traced to its evidence',
+  },
+  {
+    p: PROJECTS.spisnem,
+    side: 'right',
     desc: 'A phone-first web app that lets guests see live wait times on a map and join a restaurant queue from where they stand, with a calm dashboard for the restaurant to call parties in.',
     chips: ['Software', 'Product', 'Mobile'],
     points: ['Live wait times on a map', 'Guest and restaurant interfaces', 'Join the queue from where you stand', 'A calm dashboard to call parties in'],
     live: { href: PROJECTS.spisnem.url, label: 'Live project' },
     note: 'Live queue and map, for guests and staff',
   },
-  {
-    p: PROJECTS.minwin,
-    side: 'right',
-    desc: 'An experimental Windows 11 optimisation tool, written in Rust. It benchmarks every change instead of trusting placebo tweaks, explains each one, and can roll all of it back.',
-    chips: ['Systems', 'Rust', 'Windows'],
-    points: ['Measure before changing anything', 'Profiles in plain TOML', 'See exactly what changed', 'Roll back any change'],
-    stack: ['Rust', 'Win32 (windows-rs)', 'TOML', 'SQLite', 'DISM', 'powercfg'],
-    note: 'Measure, apply, roll back. No guessing.',
-  },
 ]
 
-// Real crops of the products themselves, used behind each collage.
+// Real crops of the products themselves, used behind each collage. SPECTRE has no screenshots yet.
 const TEXTURES = {
   applyer: ['/assets/applyer/applyer-checks.webp', '/assets/applyer/applyer-landing.webp'],
   spisnem: ['/assets/spisnem/spisnem-discover.webp', '/assets/spisnem/spisnem-queue.webp'],
-  minwin: ['/assets/minwin/minwin-stage.webp', '/assets/minwin/minwin-stage.webp'],
 }
 
 function HandArrow({ flip = '' }) {
@@ -85,10 +86,10 @@ function Collage({ slug, to, note }) {
   return (
     <Link to={to} className={`wc wc--${slug}`} ref={ref} aria-label={`${PROJECTS[slug].name}: open the case study`}>
       <span className="wc-block wc-block--1" aria-hidden="true">
-        <img src={TEXTURES[slug][0]} alt="" width="800" height="600" />
+        {TEXTURES[slug] && <img src={TEXTURES[slug][0]} alt="" width="800" height="600" />}
       </span>
       <span className="wc-block wc-block--2" aria-hidden="true">
-        <img src={TEXTURES[slug][1]} alt="" width="800" height="600" />
+        {TEXTURES[slug] && <img src={TEXTURES[slug][1]} alt="" width="800" height="600" />}
       </span>
 
       {slug === 'applyer' && (
@@ -116,17 +117,17 @@ function Collage({ slug, to, note }) {
         </>
       )}
 
-      {slug === 'minwin' && (
+      {slug === 'spectre' && (
         <>
-          <span className="wc-item wc-main" style={{ '--d': 5 }}>
-            <img src="/assets/minwin/minwin-stage.webp" alt="A Windows 11 desktop wallpaper in deep orange" width="1600" height="1000" decoding="async" />
+          <span className="wc-item wc-main sp-screen" style={{ '--d': 5 }}>
+            <AttackGraph label="SPECTRE: an attack path from a developer to the customer database" />
           </span>
-          <span className="wc-item wc-sec wc-loop" style={{ '--d': 10 }} aria-hidden="true">
-            <b>minwin</b>
-            <span><i>1</i> measure</span>
-            <span><i>2</i> apply</span>
-            <span><i>3</i> diff</span>
-            <span><i>4</i> roll back</span>
+          <span className="wc-item wc-sec wc-path" style={{ '--d': 10 }} aria-hidden="true">
+            <b>finding 01 · critical</b>
+            <span><i>1</i> assume CI deployer</span>
+            <span><i>2</i> assume app runtime</span>
+            <span><i>3</i> read DB credentials</span>
+            <span><i>4</i> customer DB</span>
           </span>
         </>
       )}
@@ -212,8 +213,8 @@ export default function Work() {
                 <div className="wp-meta-status">
                   <dt>Status</dt>
                   <dd>
-                    <span className={`wp-dot ${p.slug === 'minwin' ? 'is-early' : ''}`} aria-hidden="true" />
-                    {p.slug === 'minwin' ? 'Early development' : p.slug === 'spisnem' ? 'Ongoing, in beta' : 'Ongoing'}
+                    <span className={`wp-dot ${p.slug === 'spectre' ? 'is-early' : ''}`} aria-hidden="true" />
+                    {p.slug === 'spectre' ? 'Work in progress' : p.slug === 'spisnem' ? 'Ongoing, in beta' : 'Ongoing'}
                   </dd>
                 </div>
               </dl>

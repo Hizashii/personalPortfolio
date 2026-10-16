@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react'
 import '@fontsource/caveat/500.css'
 import { Arrow } from '../components/ui'
+import { AttackGraph } from '../components/demos'
 import { Link } from '../router'
 import { PROJECTS, SOCIALS } from '../data'
 
 const A = PROJECTS.applyer
+const X = PROJECTS.spectre
 const S = PROJECTS.spisnem
-const M = PROJECTS.minwin
 
 const WORK = [
   {
@@ -15,14 +16,14 @@ const WORK = [
     tags: ['Software', 'Automation', 'Infrastructure'],
   },
   {
+    p: X,
+    line: 'Traces how cloud permissions chain into a breach, then tests the fix.',
+    tags: ['Security', 'Systems', 'Python'],
+  },
+  {
     p: S,
     line: 'A restaurant queue guests can join before reaching the door.',
     tags: ['Product', 'Software', 'Mobile'],
-  },
-  {
-    p: M,
-    line: 'A Windows optimisation tool that measures before changing anything.',
-    tags: ['Systems', 'Rust', 'Windows'],
   },
 ]
 
@@ -124,13 +125,13 @@ function HeroCollage() {
         </span>
       </Link>
 
-      <Link to="/minwin" className="hc-item hc-m" style={{ '--d': 8 }} aria-label="MinWin, Windows optimisation tool">
-        <span className="hc-img">
-          <img src="/assets/minwin/minwin-stage.webp" alt="" width="1600" height="1000" />
+      <Link to="/spectre" className="hc-item hc-x" style={{ '--d': 8 }} aria-label="SPECTRE, attack-path analysis">
+        <span className="hc-img sp-screen">
+          <AttackGraph compact />
         </span>
-        <span className="hc-note hc-note--m hand">
-          <b>MinWin</b>
-          <i>Windows optimisation tool</i>
+        <span className="hc-note hc-note--x hand">
+          <b>SPECTRE</b>
+          <i>Attack-path analysis</i>
           <NoteArrow className="hc-arrow--up" />
         </span>
       </Link>
@@ -226,9 +227,9 @@ export default function Home() {
                     <img className="stage-phone stage-phone--2" src="/assets/spisnem/spisnem-queue.webp" alt="" width="256" height="500" loading="lazy" />
                   </span>
                 )}
-                {p.slug === 'minwin' && (
-                  <span className="stage stage--minwin">
-                    <img className="stage-main" src="/assets/minwin/minwin-stage.webp" alt="" width="1600" height="1000" loading="lazy" />
+                {p.slug === 'spectre' && (
+                  <span className="stage stage--spectre">
+                    <AttackGraph />
                   </span>
                 )}
               </Link>

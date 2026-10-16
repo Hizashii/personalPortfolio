@@ -45,7 +45,7 @@ export function CaseSection({ id, n, label, title, children, aside, dark = false
 
 // Where to go next, so the three case studies read as one set.
 export function CaseNext({ from }) {
-  const order = ['applyer', 'spisnem', 'minwin']
+  const order = ['applyer', 'spectre', 'spisnem']
   const next = PROJECTS[order[(order.indexOf(from) + 1) % order.length]]
   return (
     <section className="ce-next wrap" aria-label="Next project">

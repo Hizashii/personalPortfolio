@@ -48,8 +48,8 @@ const CURIOUS = [
 
 const NOW = [
   ['Working', 'Full-stack engineer at Weblager'],
-  ['Building', 'Applyer, with a team'],
-  ['Tinkering', 'MinWin, an offline agent network and local models'],
+  ['Building', 'Applyer with a team, and SPECTRE'],
+  ['Tinkering', 'An offline agent network and local models'],
   ['Studying', 'PBA in Web Development, until 2027'],
 ]
 

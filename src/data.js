@@ -48,9 +48,19 @@ export const PROJECTS = {
     ],
     stack: 'TypeScript · Supabase (Postgres) · DuckDB · Docker · Terraform · Ansible · Oracle Cloud VM',
   },
+  spectre: {
+    slug: 'spectre',
+    sheet: '02',
+    name: 'SPECTRE',
+    tagline: 'Understand the path. Break the chain.',
+    status: 'Work in progress',
+    summary:
+      'A cloud attack-path analysis and remediation-simulation tool. It shows how identities, roles, policies and credentials chain into access to sensitive data, traces every step to its evidence, and tests a fix on a copy before you trust it.',
+    repo: 'https://github.com/Hizashii/SPECTURE',
+  },
   spisnem: {
     slug: 'spisnem',
-    sheet: '02',
+    sheet: '03',
     name: 'Spisnem',
     tagline: 'Join a restaurant queue from where you stand.',
     status: 'Ongoing',
@@ -61,36 +71,7 @@ export const PROJECTS = {
       'A phone-first web app that lets guests see live wait times on a map and join a restaurant queue from where they stand, with a calm dashboard for the restaurant to call parties in.',
     url: 'https://spisnem-main.vercel.app/',
   },
-  minwin: {
-    slug: 'minwin',
-    sheet: '03',
-    name: 'MinWin',
-    tagline: 'Makes Windows lighter without blindly disabling things.',
-    status: 'Experimental',
-    lit: [],
-    partial: [4],
-    dims: ['Systems', 'Software'],
-    summary:
-      'An experimental Windows 11 optimisation tool, written in Rust, that makes a standard install lighter and easier to control. It benchmarks every change instead of trusting placebo tweaks, explains each one, and can roll all of it back.',
-    stack: 'Rust · Win32 (windows-rs) · TOML · SQLite · DISM · powercfg',
-  },
 }
-
-export const MINWIN_CLI = [
-  ['minwin status', 'What is running, and what it costs'],
-  ['minwin benchmark', 'Measure idle use, startup and background activity'],
-  ['minwin apply minimal', 'Apply a profile: minimal, gaming or developer'],
-  ['minwin diff', 'See exactly what changed'],
-  ['minwin rollback', 'Undo every change'],
-]
-
-export const MINWIN_GOALS = [
-  'Lower idle resource use',
-  'Faster startup',
-  'Less background activity',
-  'Keep gaming, drivers, Windows Update and security working',
-  'Every change explained, benchmarked and reversible',
-]
 
 export const EXPERIENCE = [
   {
@@ -170,7 +151,7 @@ export const ABOUT = [
   ['I started in support, learning how systems break.', 'At Cisco and Microsoft I diagnosed systems I had not built. Then I moved into building them.'],
   ['Today I work across full-stack software.', 'And I spend more and more of my time on automation, infrastructure, reliability and security.'],
   ['I like owning problems end to end.', 'I want to understand why a thing should exist, not only how to implement it, and learn enough about the system around it to make better decisions.'],
-  ['That is why I build outside work too.', 'Applyer, Spisnem and MinWin are where I practise taking something from nothing to working software.'],
+  ['That is why I build outside work too.', 'Applyer, SPECTRE and Spisnem are where I practise taking something from nothing to working software.'],
 ]
 
 export const ABOUT_META =

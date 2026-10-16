@@ -8,7 +8,7 @@ import Work from './pages/Work'
 import Lab from './pages/Lab'
 import CaseApplyer from './pages/CaseApplyer'
 import CaseSpisnem from './pages/CaseSpisnem'
-import CaseMinWin from './pages/CaseMinWin'
+import CaseSpectre from './pages/CaseSpectre'
 import { Arrow } from './components/ui'
 
 // A small pill that follows the pointer and names what a click will do. Fine pointers only.
@@ -108,7 +108,7 @@ function Routes() {
   const view = useMemo(() => {
     if (path === '/applyer') return <CaseApplyer />
     if (path === '/spisnem') return <CaseSpisnem />
-    if (path === '/minwin') return <CaseMinWin />
+    if (path === '/spectre') return <CaseSpectre />
     if (path === '/work') return <Work />
     if (path === '/experience') return <Experience />
     if (path === '/lab') return <Lab />
@@ -119,10 +119,10 @@ function Routes() {
   // The homepage has its own warm palette; everything else keeps the current one for now.
   useEffect(() => {
     const el = document.documentElement
-    const warm = ['/', '/lab', '/work', '/experience', '/about', '/applyer', '/spisnem', '/minwin']
+    const warm = ['/', '/lab', '/work', '/experience', '/about', '/applyer', '/spisnem', '/spectre']
     if (warm.includes(path)) el.setAttribute('data-home', '')
     else el.removeAttribute('data-home')
-    if (path === '/minwin') el.setAttribute('data-dark', '')
+    if (path === '/spectre') el.setAttribute('data-dark', '')
     else el.removeAttribute('data-dark')
   }, [path])
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 
 const Ico = ({ d, size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -382,161 +382,222 @@ export function SpisnemDemo() {
   )
 }
 
+
 /* =====================================================================
-   MinWin: a simulated CLI. Numbers are illustrative, never real output.
+   SPECTRE: the Northstar Financial scenario from the README, replayed in
+   the browser. A tiny reachability check, not the real policy engine.
    ===================================================================== */
-const HELP = [
-  'minwin status          current state of the machine',
-  'minwin benchmark       measure before changing anything',
-  'minwin apply <profile> minimal | gaming | developer',
-  'minwin diff            what changed, and why',
-  'minwin rollback        undo every change',
-  'clear                  clear the screen',
+const SP_NODES = [
+  { id: 'alice', kind: 'user', t: 'Alice', x: 70, y: 84 },
+  { id: 'ci', kind: 'role', t: 'CI deployer', x: 260, y: 84 },
+  { id: 'runtime', kind: 'role', t: 'App runtime', x: 450, y: 84 },
+  { id: 'secret', kind: 'secret', t: 'DB credentials', x: 450, y: 224, restricted: true },
+  { id: 'db', kind: 'database', t: 'Customer DB', x: 260, y: 224, restricted: true },
+  { id: 'artifacts', kind: 'bucket', t: 'Build artifacts', x: 70, y: 224 },
 ]
-const CHIPS = ['minwin status', 'minwin benchmark', 'minwin apply minimal', 'minwin diff', 'minwin rollback']
+// sid: the policy statement that backs the edge. The secret-to-database edge is a modeled relationship.
+// clearA / clearB: the edge leaves or enters through a node's labels, so it stops short of them.
+const SP_EDGES = [
+  { a: 'alice', b: 'ci', sid: 'assume-ci', lx: 165, ly: 72 },
+  { a: 'ci', b: 'runtime', sid: 'assume-runtime', lx: 355, ly: 72 },
+  { a: 'runtime', b: 'secret', sid: 'read-db-secret', lx: 440, ly: 158, anchor: 'end', clearA: true, clearB: true },
+  { a: 'secret', b: 'db', t: 'credential access', lx: 355, ly: 212, modeled: true },
+  { a: 'ci', b: 'artifacts', sid: 'artifacts-rw', lx: 178, ly: 160, anchor: 'start', clearA: true },
+]
+const SP_LEGIT = [
+  { needs: 'assume-ci', t: 'Developers can use the CI deployer role' },
+  { needs: 'artifacts-rw', t: 'CI can publish build artifacts' },
+]
+const SP_CHANGES = [
+  { sid: null, t: 'No change', policy: 'The scenario as loaded' },
+  { sid: 'assume-runtime', t: 'Remove assume-runtime', policy: 'CI deployer permissions' },
+  { sid: 'assume-ci', t: 'Remove assume-ci', policy: 'Developer may assume the CI deployer' },
+  {
+    sid: 'read-db-secret',
+    t: 'Remove read-db-secret',
+    policy: 'Runtime may read its database secret',
+    caveat:
+      'Effective, and yet the app can no longer read its own database password. Nothing declared that it must, so the model cannot know. A verdict is only as good as the access you declare.',
+  },
+]
 
-export function MinWinTerminal() {
-  const [lines, setLines] = useState([
-    { t: 'sys', s: 'MinWin (simulated preview). Type a command or tap one below. Try "help".' },
-  ])
-  const [val, setVal] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [st, setSt] = useState({ base: false, profile: null })
-  const timers = useRef([])
-  const end = useRef(null)
+const spById = Object.fromEntries(SP_NODES.map((n) => [n.id, n]))
 
-  useEffect(() => () => timers.current.forEach(clearTimeout), [])
-  useEffect(() => {
-    end.current?.scrollTo({ top: end.current.scrollHeight })
-  }, [lines])
-
-  const emit = (out, done) => {
-    setBusy(true)
-    const gap = calm() ? 0 : 130
-    out.forEach((l, i) => {
-      timers.current.push(
-        setTimeout(() => {
-          setLines((x) => [...x, l])
-          if (i === out.length - 1) {
-            setBusy(false)
-            done?.()
-          }
-        }, gap * (i + 1)),
-      )
-    })
+// Breadth-first from Alice over the edges that survive the change.
+function spAnalyse(removed) {
+  const live = SP_EDGES.filter((e) => !e.sid || e.sid !== removed)
+  const depth = { alice: 0 }
+  const queue = ['alice']
+  while (queue.length) {
+    const at = queue.shift()
+    for (const e of live) {
+      if (e.a === at && !(e.b in depth)) {
+        depth[e.b] = depth[at] + 1
+        queue.push(e.b)
+      }
+    }
   }
-
-  const run = (raw) => {
-    const cmd = raw.trim().replace(/\s+/g, ' ')
-    if (!cmd || busy) return
-    setLines((x) => [...x, { t: 'in', s: cmd }])
-    setVal('')
-    const a = cmd.toLowerCase().split(' ')
-    if (cmd.toLowerCase() === 'clear') return setLines([])
-    if (cmd.toLowerCase() === 'help') return emit(HELP.map((s) => ({ t: 'out', s })))
-    if (a[0] !== 'minwin') return emit([{ t: 'err', s: `command not found: ${a[0]}. Try "help".` }])
-
-    const sub = a[1]
-    if (sub === 'status') {
-      return emit([
-        { t: 'out', s: 'Windows 11 (standard install)' },
-        { t: 'out', s: `baseline     ${st.base ? 'recorded' : 'none yet'}` },
-        { t: 'out', s: `profile      ${st.profile ?? 'none'}` },
-        { t: 'out', s: 'rollback     ' + (st.profile ? 'available' : 'nothing to undo') },
-      ])
+  const findings = SP_NODES.filter((n) => n.restricted && n.id in depth).map((n) => ({ ...n, steps: depth[n.id] }))
+  // An edge is on an attack path when it leads to a reached restricted node.
+  const hot = new Set()
+  const back = findings.map((f) => f.id)
+  while (back.length) {
+    const to = back.pop()
+    for (const e of live) {
+      if (e.b === to && e.a in depth && !hot.has(e)) {
+        hot.add(e)
+        back.push(e.a)
+      }
     }
-    if (sub === 'benchmark') {
-      return emit(
-        [
-          { t: 'out', s: 'running 12 passes...' },
-          { t: 'out', s: 'idle memory     median 4.1 GB   iqr 0.08' },
-          { t: 'out', s: 'startup time    median 31.2 s   iqr 1.4' },
-          { t: 'out', s: 'background cpu  median 3.9 %    iqr 0.6' },
-          { t: 'ok', s: 'baseline recorded. Enough passes to trust it.' },
-        ],
-        () => setSt((s) => ({ ...s, base: true })),
-      )
-    }
-    if (sub === 'apply') {
-      const prof = a[2]
-      if (!['minimal', 'gaming', 'developer'].includes(prof))
-        return emit([{ t: 'err', s: 'usage: minwin apply <minimal|gaming|developer>' }])
-      if (!st.base) return emit([{ t: 'err', s: 'no baseline. Run "minwin benchmark" first, so the change can be judged.' }])
-      return emit(
-        [
-          { t: 'out', s: `profile: ${prof}` },
-          { t: 'out', s: 'checking Windows Update, drivers and security are untouched... ok' },
-          { t: 'out', s: 'applying 14 changes, each with a recorded undo' },
-          { t: 'ok', s: 'done. Run "minwin diff" to see exactly what changed.' },
-        ],
-        () => setSt((s) => ({ ...s, profile: prof })),
-      )
-    }
-    if (sub === 'diff') {
-      if (!st.profile) return emit([{ t: 'err', s: 'nothing to diff. Apply a profile first.' }])
-      return emit([
-        { t: 'out', s: 'idle memory     4.1 GB  ->  3.6 GB   (-12 %)' },
-        { t: 'out', s: 'startup time    31.2 s  ->  27.9 s   (-11 %)' },
-        { t: 'out', s: 'background cpu  3.9 %   ->  2.8 %    (-28 %)' },
-        { t: 'out', s: '14 changes, 0 touching updates, drivers or security' },
-        { t: 'ok', s: 'illustrative numbers. Every change can be explained and reversed.' },
-      ])
-    }
-    if (sub === 'rollback') {
-      if (!st.profile) return emit([{ t: 'err', s: 'nothing to roll back.' }])
-      return emit(
-        [
-          { t: 'out', s: 'reverting 14 changes in reverse order...' },
-          { t: 'ok', s: 'rolled back. The machine is as it was.' },
-        ],
-        () => setSt((s) => ({ ...s, profile: null })),
-      )
-    }
-    return emit([{ t: 'err', s: `unknown subcommand "${sub ?? ''}". Try "help".` }])
   }
+  const legit = SP_LEGIT.map((l) => ({ ...l, pass: l.needs !== removed }))
+  return { depth, live, hot, findings, legit, objective: !('db' in depth) }
+}
 
+const SP_BASE = spAnalyse(null)
+
+function spVerdict(r, removed) {
+  if (!removed) return { tone: 'bad', t: `${r.findings.length} critical findings`, s: 'Alice can reach the customer database. The objective is violated.' }
+  if (r.legit.some((l) => !l.pass))
+    return { tone: 'bad', t: 'Breaks legitimate access', s: 'The path is gone, and so is something that must keep working. Removing a path is not a fix if it breaks the product.' }
+  if (!r.findings.length) return { tone: 'ok', t: 'Effective under the modeled rules', s: 'Every finding resolved, the objective holds, and legitimate access is intact.' }
+  return { tone: 'bad', t: 'Partial', s: 'Some paths remain.' }
+}
+
+const SP_KIND = { user: 'USER', role: 'ROLE', secret: 'SECRET', database: 'DATABASE', bucket: 'BUCKET' }
+
+// The graph on its own dark screen. `removed` is the statement taken out, if any.
+export function AttackGraph({ removed = null, compact = false, label }) {
+  const r = removed ? spAnalyse(removed) : SP_BASE
+  const R = compact ? 13 : 10
+  // Marker ids must be unique, since several graphs can share a page.
+  const id = useId()
   return (
-    <div className="dm dm-mw">
-      <p className="dm-mw-head mono">
-        <span>minwin · simulated preview</span>
-        <span>{st.profile ? `profile: ${st.profile}` : st.base ? 'baseline ok' : 'no baseline'}</span>
+    <svg
+      className={`sp-graph ${compact ? 'is-compact' : ''}`}
+      viewBox="0 0 520 300"
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : 'true'}
+    >
+      <defs>
+        <marker id={`${id}a`} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" className="sp-head" />
+        </marker>
+        <marker id={`${id}h`} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0 0 L8 4 L0 8 z" className="sp-head is-hot" />
+        </marker>
+      </defs>
+      {SP_EDGES.map((e) => {
+        const a = spById[e.a]
+        const b = spById[e.b]
+        const len = Math.hypot(b.x - a.x, b.y - a.y)
+        const ux = (b.x - a.x) / len
+        const uy = (b.y - a.y) / len
+        const pa = R + (e.clearA ? (compact ? 34 : 30) : 6)
+        const pb = R + (e.clearB ? (compact ? 8 : 26) : 6)
+        const d = `M${a.x + ux * pa} ${a.y + uy * pa} L${b.x - ux * pb} ${b.y - uy * pb}`
+        const cut = e.sid && e.sid === removed
+        const hot = r.hot.has(e)
+        const state = cut ? 'is-cut' : hot ? 'is-hot' : e.a in r.depth ? 'is-ok' : 'is-idle'
+        return (
+          <g key={e.a + e.b} className={`sp-e ${state} ${e.modeled ? 'is-modeled' : ''}`}>
+            <path d={d} markerEnd={cut ? undefined : `url(#${id}${hot ? 'h' : 'a'})`} />
+            {hot && <path d={d} className="sp-flow" />}
+            {cut && <path className="sp-x" d={`M${(a.x + b.x) / 2 - 7} ${(a.y + b.y) / 2 - 7}l14 14m0 -14l-14 14`} />}
+            {!compact && (
+              <text x={e.lx} y={e.ly} textAnchor={e.anchor || 'middle'} className="sp-elabel">
+                {e.sid || e.t}
+              </text>
+            )}
+          </g>
+        )
+      })}
+      {SP_NODES.map((n) => {
+        const reached = n.id in r.depth
+        const cls = ['sp-n', reached && 'is-reached', n.restricted && 'is-restricted', n.id === 'alice' && 'is-entry'].filter(Boolean).join(' ')
+        return (
+          <g key={n.id} className={cls}>
+            {n.restricted && <circle cx={n.x} cy={n.y} r={R + 6} className="sp-ring" />}
+            <circle cx={n.x} cy={n.y} r={R} className="sp-dot" />
+            {!compact && (
+              <text x={n.x} y={n.y - R - 12} textAnchor="middle" className="sp-kind">
+                {SP_KIND[n.kind]}
+              </text>
+            )}
+            <text x={n.x} y={n.y + R + (compact ? 26 : 22)} textAnchor="middle" className="sp-name">
+              {n.t}
+            </text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+export function RemediationLab() {
+  const [pick, setPick] = useState(0)
+  const change = SP_CHANGES[pick]
+  const r = change.sid ? spAnalyse(change.sid) : SP_BASE
+  const v = spVerdict(r, change.sid)
+  return (
+    <div className="dm sp-lab">
+      <p className="cm-term-head mono">
+        <span>northstar-financial · remediation lab</span>
+        <span>replayed in your browser</span>
       </p>
-      <div className="dm-mw-out" ref={end} role="log" aria-live="polite">
-        {lines.map((l, i) => (
-          <p key={i} className={`dm-ln is-${l.t}`}>
-            {l.t === 'in' && <span className="dm-ps">&gt; </span>}
-            {l.s}
-          </p>
-        ))}
+      <div className="sp-lab-body">
+        <fieldset className="sp-changes">
+          <legend className="mono">Change one statement</legend>
+          {SP_CHANGES.map((c, i) => (
+            <label key={c.t} className={pick === i ? 'is-on' : ''}>
+              <input type="radio" name="sp-change" checked={pick === i} onChange={() => setPick(i)} />
+              <span className="sp-change-t mono">{c.t}</span>
+              <span className="sp-change-p">{c.policy}</span>
+            </label>
+          ))}
+        </fieldset>
+        <div className="sp-lab-graph">
+          <AttackGraph
+            removed={change.sid}
+            label={`Attack graph. ${r.findings.length ? `Alice reaches ${r.findings.map((f) => f.t).join(' and ')}.` : 'Alice reaches nothing sensitive.'}`}
+          />
+        </div>
       </div>
-      <form
-        className="dm-mw-in"
-        onSubmit={(e) => {
-          e.preventDefault()
-          run(val)
-        }}
-      >
-        <label htmlFor="mw-input" className="dm-ps">
-          &gt;
-        </label>
-        <input
-          id="mw-input"
-          value={val}
-          onChange={(e) => setVal(e.target.value)}
-          placeholder="type a command"
-          autoComplete="off"
-          spellCheck="false"
-          disabled={busy}
-        />
-      </form>
-      <div className="dm-mw-chips">
-        {CHIPS.map((c) => (
-          <button key={c} onClick={() => run(c)} disabled={busy}>
-            {c}
-          </button>
-        ))}
+      <div className="sp-lab-read" aria-live="polite">
+        <p className={`sp-verdict is-${v.tone}`}>
+          <b>{v.t}</b>
+          <span>{change.caveat || v.s}</span>
+        </p>
+        <dl className="sp-checks">
+          <div>
+            <dt className="mono">Findings</dt>
+            <dd>
+              {r.findings.length
+                ? r.findings.map((f) => `${f.t}, ${f.steps} steps`).join(' · ')
+                : `None (was ${SP_BASE.findings.length})`}
+            </dd>
+          </div>
+          <div>
+            <dt className="mono">Objective</dt>
+            <dd className={r.objective ? 'is-pass' : 'is-fail'}>
+              Alice must not reach the customer DB: {r.objective ? 'holds' : 'violated'}
+            </dd>
+          </div>
+          {r.legit.map((l) => (
+            <div key={l.needs}>
+              <dt className="mono">Must keep working</dt>
+              <dd className={l.pass ? 'is-pass' : 'is-fail'}>
+                {l.t}: {l.pass ? 'passes' : 'broken'}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </div>
-      <p className="dm-note">Illustrative numbers from a simulation, not output from the real tool.</p>
+      <p className="dm-note">
+        The README walkthrough, recomputed with a few lines of JavaScript. The real engine is Python, evaluates
+        policies and keeps evidence for every step.
+      </p>
     </div>
   )
 }

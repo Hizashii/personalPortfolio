@@ -3,11 +3,10 @@ import '@fontsource-variable/newsreader/wght.css'
 import '@fontsource/caveat/500.css'
 import { Flow, PIPELINE } from '../components/drawings'
 import { Arrow } from '../components/ui'
+import { AttackGraph } from '../components/demos'
 import { Link } from '../router'
 import { TICKER } from '../data'
 import { useMedia, useReducedMotion } from '../hooks'
-
-const MINWIN_STEPS = ['Measure', 'Apply', 'Diff', 'Roll back']
 
 const PRINCIPLES = [
   {
@@ -151,28 +150,20 @@ function AgentNet({ calm }) {
   )
 }
 
-// The real image, with the four steps cycling over it.
-function MinWinPanel({ calm }) {
-  const [i, setI] = useState(0)
-  useEffect(() => {
-    if (calm) return
-    const t = setInterval(() => setI((n) => (n + 1) % MINWIN_STEPS.length), 2200)
-    return () => clearInterval(t)
-  }, [calm])
+// The attack path, and the one change that breaks it. Tap to toggle.
+function SpectrePanel() {
+  const [cut, setCut] = useState(false)
   return (
     <button
       type="button"
-      className="mw"
-      aria-label={`MinWin loop, step ${i + 1}: ${MINWIN_STEPS[i]}. Tap for the next step.`}
-      onClick={() => setI((n) => (n + 1) % MINWIN_STEPS.length)}
+      className="sp-screen sp-panel"
+      aria-pressed={cut}
+      aria-label={cut ? 'Attack path broken: the CI deployer can no longer assume the app runtime. Tap to restore.' : 'Attack path from a developer to the customer database. Tap to break the chain.'}
+      onClick={() => setCut((v) => !v)}
     >
-      <img src="/assets/minwin/minwin-stage.webp" alt="" width="1600" height="1000" loading="lazy" />
-      <span className="mw-steps2" aria-hidden="true">
-        {MINWIN_STEPS.map((s, k) => (
-          <span key={s} className={k === i ? 'is-on' : ''}>
-            <b>{k + 1}</b> {s}
-          </span>
-        ))}
+      <AttackGraph compact removed={cut ? 'assume-runtime' : null} />
+      <span className="sp-panel-state mono" aria-hidden="true">
+        {cut ? '0 findings' : '2 findings'}
       </span>
     </button>
   )
@@ -384,16 +375,16 @@ export default function Lab() {
                 Early <i className="ln-status-ring" aria-hidden="true" />
               </span>
             </p>
-            <div className="ln-panel ln-panel--img">
-              <MinWinPanel calm={calm} />
+            <div className="ln-panel ln-panel--dark">
+              <SpectrePanel />
             </div>
             <h2 className="ln-card-title">
-              <Link to="/minwin" className="ln-card-link">
-                MinWin <Arrow dir="ne" />
+              <Link to="/spectre" className="ln-card-link">
+                SPECTRE <Arrow dir="ne" />
               </Link>
             </h2>
-            <p className="ln-card-text">A Windows tool in Rust that measures before it changes anything.</p>
-            <p className="ln-hint">The loop every change goes through. Tap to step.</p>
+            <p className="ln-card-text">Finds how cloud permissions chain into a breach, and tests the fix first.</p>
+            <p className="ln-hint">Tap the graph to break the chain.</p>
           </li>
 
           <li className="ln-card">
