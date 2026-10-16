@@ -34,17 +34,43 @@
   --text-h3: clamp(1.25rem, 1.12rem + 0.55vw, 1.625rem);
   --text-h3--line-height: 1.2;
   --text-h3--letter-spacing: -0.012em;
+  --text-numeral: clamp(3.5rem, 2rem + 6vw, 7.5rem);
+  --text-numeral--line-height: 0.85;
+  --text-numeral--letter-spacing: -0.04em;
   --text-lede: clamp(1.125rem, 1.04rem + 0.4vw, 1.375rem);
   --text-lede--line-height: 1.5;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.45;
   --text-meta: 0.8125rem;
   --text-meta--line-height: 1.4;
   --text-meta--letter-spacing: 0.02em;
 
   --spacing-gutter: clamp(1rem, 0.4rem + 2.6vw, 3.5rem);
   --spacing-section: clamp(4.5rem, 3rem + 6vw, 9rem);
+  /* Below this the header shows only the monogram */
+  --breakpoint-xs: 22.5rem;
+
+  --spacing-header: 4rem;
   --container-page: 84rem;
+  /* Comfortable line length for running text */
+  --container-measure: 38rem;
+  --aspect-preview: 16 / 10;
 
   --ease-cut: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-menu-in: menu-in 240ms var(--ease-cut) both;
+  --animate-rise: rise 600ms var(--ease-cut) both;
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      translate: -10px 0;
+    }
+  }
+  @keyframes rise {
+    from {
+      translate: 0 105%;
+    }
+  }
 }
 
 @layer base {
@@ -54,7 +80,7 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: calc(var(--spacing-header) + 1rem);
   }
   body {
     min-height: 100dvh;
@@ -148,7 +174,14 @@
     text-decoration: none;
     transition: color 220ms var(--ease-cut);
   }
-  .btn::before {
+  /* Rows that take the same hover cut as buttons */
+  .slab {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .btn::before,
+  .slab::before {
     content: "";
     position: absolute;
     inset: 0 -1.5rem;
@@ -159,7 +192,9 @@
     transition: transform 320ms var(--ease-cut);
   }
   .btn:hover::before,
-  .btn:focus-visible::before {
+  .btn:focus-visible::before,
+  .slab:hover::before,
+  .slab:focus-visible::before {
     transform: translateX(0);
   }
   .btn-primary {
@@ -229,6 +264,24 @@
     background-color: var(--color-ai);
     color: var(--color-gofun);
   }
+
+  /* Headline lines that rise out of a mask on first paint; each line follows the last */
+  .reveal-line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.06em;
+  }
+  .reveal-line > span {
+    display: block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-line > span {
+      animation: var(--animate-rise);
+    }
+    .reveal-line + .reveal-line > span {
+      animation-delay: 90ms;
+    }
+  }
 }
 
 /* Page transitions: a short slide, using the router's View Transitions */
@@ -252,9 +305,108 @@
     translate: 16px 0;
   }
 }
-@keyframes menu-in {
-  from {
-    opacity: 0;
-    translate: -10px 0;
+
+/* SPECTRE attack graph (components/demos.jsx), drawn on an indigo surface */
+@layer components {
+  .sp-graph {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .sp-e path {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-gofun) 40%, transparent);
+    stroke-width: 1.5;
+    transition: stroke 300ms;
+  }
+  .sp-e.is-idle path {
+    stroke: color-mix(in oklab, var(--color-gofun) 15%, transparent);
+  }
+  .sp-e.is-hot path {
+    stroke: var(--color-fuji);
+    stroke-width: 2.25;
+  }
+  .sp-e.is-modeled path {
+    stroke-dasharray: 5 4;
+  }
+  .sp-e.is-cut path {
+    stroke: color-mix(in oklab, var(--color-gofun) 25%, transparent);
+    stroke-dasharray: 3 5;
+  }
+  .sp-e path.sp-flow {
+    stroke: var(--color-gofun);
+    stroke-dasharray: 2 18;
+  }
+  .sp-e path.sp-x {
+    stroke: var(--color-gofun);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-dasharray: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sp-flow {
+      animation: sp-flow 1.4s linear infinite;
+    }
+  }
+  .sp-head {
+    fill: color-mix(in oklab, var(--color-gofun) 40%, transparent);
+  }
+  .sp-head.is-hot {
+    fill: var(--color-fuji);
+  }
+  .sp-elabel {
+    font-size: 11px;
+    fill: color-mix(in oklab, var(--color-gofun) 70%, transparent);
+  }
+  .sp-e.is-hot .sp-elabel {
+    fill: var(--color-fuji);
+  }
+  .sp-e.is-cut .sp-elabel {
+    text-decoration: line-through;
+  }
+  .sp-dot {
+    fill: var(--color-ai);
+    stroke: color-mix(in oklab, var(--color-gofun) 45%, transparent);
+    stroke-width: 1.5;
+    transition: fill 300ms, stroke 300ms;
+  }
+  .sp-n.is-reached .sp-dot {
+    stroke: var(--color-gofun);
+  }
+  .sp-n.is-entry .sp-dot {
+    fill: var(--color-gofun);
+  }
+  .sp-ring {
+    fill: none;
+    stroke: color-mix(in oklab, var(--color-fuji) 50%, transparent);
+    stroke-dasharray: 2 3;
+  }
+  .sp-n.is-restricted.is-reached .sp-dot {
+    fill: var(--color-fuji);
+    stroke: var(--color-fuji);
+  }
+  .sp-n.is-restricted.is-reached .sp-ring {
+    stroke: var(--color-fuji);
+    stroke-dasharray: none;
+  }
+  .sp-kind {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    fill: color-mix(in oklab, var(--color-gofun) 60%, transparent);
+  }
+  .sp-name {
+    font-size: 13px;
+    font-weight: 500;
+    fill: var(--color-gofun);
+  }
+  .sp-graph.is-compact .sp-name {
+    font-size: 19px;
+  }
+}
+@keyframes sp-flow {
+  to {
+    stroke-dashoffset: -20;
   }
 }

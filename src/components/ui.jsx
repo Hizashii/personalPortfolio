@@ -77,6 +77,28 @@ export function Arrow({ dir = 'right', className = '' }) {
   )
 }
 
+// Section identifier: a numbered cut slab followed by the label.
+export function Marker({ n, children }) {
+  return (
+    <p className="marker">
+      <b>{n}</b>
+      {children}
+    </p>
+  )
+}
+
+export function Tags({ items }) {
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <li key={item} className="tag">
+          {item}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export function Figure({ children, caption, className = '' }) {
   return (
     <figure className={`fig ${className}`}>
