@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
-import { Arrow } from '../components/ui'
+import { Arrow, Marker, PageHeader } from '../components/ui'
+import { DetailList } from '../components/case'
 import { Link } from '../router'
 import { EXPERIENCE, SOCIALS } from '../data'
 
@@ -24,115 +25,143 @@ const ELSEWHERE = [
   ['Languages', 'English, Japanese, and Danish (learning)'],
 ]
 
-function Role({ r, first }) {
+function Arc() {
+  return (
+    <section className="wrap" aria-labelledby="arc-title">
+      <Marker n="01">
+        <span id="arc-title">Career arc</span>
+      </Marker>
+      <ol className="mt-8 grid gap-8 md:grid-cols-3">
+        {ARC.map(([stage, who, text], i) => (
+          <li key={stage} className="border-t-2 border-ai pt-5">
+            <p className="text-meta font-semibold tabular-nums text-ai-muted">0{i + 1}</p>
+            <h2 className="mt-3 text-h3 font-semibold">{stage}</h2>
+            <p className="font-medium">{who}</p>
+            <p className="mt-2 text-ai-muted">{text}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+function MoreToggle({ items }) {
   const [open, setOpen] = useState(false)
   const id = useId()
   return (
-    <li className={`xp-row ${first ? 'is-now' : ''} ${open ? 'is-open' : ''}`}>
-      <div className="xp-when">
-        <span className="xp-stage mono">{STAGE[r.id]}</span>
-        <span className="xp-dates">{r.when}</span>
+    <div className="mt-5">
+      <button
+        type="button"
+        className="link min-h-11"
+        aria-expanded={open}
+        aria-controls={id}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {open ? 'Less' : 'What this involved'}
+        <Arrow dir={open ? 'up' : 'down'} />
+      </button>
+      <ul id={id} hidden={!open} className="mt-3 grid gap-2">
+        {items.map((item) => (
+          <li key={item} className="flex items-baseline gap-3 text-ai-muted">
+            <span className="cut inline-block h-2 w-3 shrink-0 bg-fuji" aria-hidden="true" />
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function Role({ role, current }) {
+  return (
+    <li className="grid gap-4 border-t border-ai/20 py-10 lg:grid-cols-12 lg:gap-x-10">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-meta lg:col-span-3 lg:block">
+        <span className={`cut inline-block px-2.5 py-0.5 font-semibold ${current ? 'bg-fuji' : 'bg-ai/10'}`}>
+          {STAGE[role.id]}
+        </span>
+        <p className="text-ai-muted tabular-nums lg:mt-3">{role.when}</p>
       </div>
-      <div className="xp-main">
-        <h2 className="xp-role">{r.role}</h2>
-        <p className="xp-org">{r.org}</p>
-        <p className="xp-scope">{r.scope}</p>
-        <p className="xp-high">{r.highlight}</p>
-        {r.more && (
-          <>
-            <button
-              type="button"
-              className="xp-toggle"
-              aria-expanded={open}
-              aria-controls={id}
-              onClick={() => setOpen((o) => !o)}
-            >
-              <span className="xp-plus" aria-hidden="true" />
-              {open ? 'Less' : 'What this involved'}
-            </button>
-            <div className="xp-more" id={id}>
-              <ul>
-                {r.more.map((x) => (
-                  <li key={x}>{x}</li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
+      <div className="max-w-measure lg:col-span-9 lg:max-w-none">
+        <h2 className="text-h3 font-semibold">{role.role}</h2>
+        <p className="font-medium">{role.org}</p>
+        <p className="mt-4 max-w-measure">{role.scope}</p>
+        <p className="mt-4 max-w-measure border-l-2 border-fuji pl-4 font-medium">{role.highlight}</p>
+        {role.more && <MoreToggle items={role.more} />}
       </div>
     </li>
   )
 }
 
-export default function Experience() {
+function Roles() {
   return (
-    <main className="xp">
-      <header className="wp-head wrap">
-        <p className="hm-kicker">
-          <span className="hm-dot" aria-hidden="true" />
-          Experience
-        </p>
-        <div className="wp-head-row">
-          <div>
-            <h1 className="wp-h1">Four years, one direction.</h1>
-            <p className="wp-h1-sub">From diagnosing systems to building them.</p>
-          </div>
-          <p className="wp-intro">
-            I started in support, learning how systems break. Then I moved into building them, and the scope
-            has been widening ever since.
-          </p>
-        </div>
-      </header>
+    <section className="wrap pt-section" aria-labelledby="roles-title">
+      <Marker n="02">
+        <span id="roles-title">Roles, most recent first</span>
+      </Marker>
+      <ol className="mt-6 border-b border-ai/20">
+        {EXPERIENCE.map((role, i) => (
+          <Role key={role.id} role={role} current={i === 0} />
+        ))}
+      </ol>
+    </section>
+  )
+}
 
-      <section className="wrap xp-arc-wrap" aria-label="Career arc">
-        <ol className="xp-arc">
-          {ARC.map(([t, who, d], i) => (
-            <li key={t}>
-              <span className="mono xp-arc-n">0{i + 1}</span>
-              <h2>{t}</h2>
-              <b>{who}</b>
-              <p>{d}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+function Elsewhere() {
+  return (
+    <section className="wrap pt-section" aria-labelledby="else-title">
+      <Marker n="03">
+        <span id="else-title">Elsewhere</span>
+      </Marker>
+      <div className="mt-6 max-w-3xl">
+        <DetailList items={ELSEWHERE} />
+      </div>
+    </section>
+  )
+}
 
-      <section className="wrap xp-list-wrap" aria-label="Roles, most recent first">
-        <ol className="xp-list">
-          {EXPERIENCE.map((r, i) => (
-            <Role key={r.id} r={r} first={i === 0} />
-          ))}
-        </ol>
-      </section>
-
-      <section className="wrap xp-else" aria-labelledby="else-t">
-        <h2 id="else-t" className="hm-h2">
-          Elsewhere
-        </h2>
-        <dl>
-          {ELSEWHERE.map(([k, v]) => (
-            <div key={k}>
-              <dt>{k}</dt>
-              <dd>{v}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      <section className="wp-end wrap" aria-label="Next">
+function NextSteps() {
+  return (
+    <section className="wrap pt-section" aria-labelledby="next-title">
+      <div className="grid gap-8 border-y border-ai/20 py-12 md:grid-cols-[1fr_auto] md:items-center md:gap-12">
         <div>
-          <h2 className="wp-end-title">Want the full picture?</h2>
-          <p className="wp-end-text">The CV has the details, and the work shows what it looks like in practice.</p>
+          <h2 id="next-title" className="text-h3 font-semibold">
+            Want the full picture?
+          </h2>
+          <p className="mt-2 text-ai-muted">The CV has the details, and the work shows what it looks like in practice.</p>
         </div>
-        <div className="wp-end-cta">
-          <a href={SOCIALS.cv} className="btn btn--line" target="_blank" rel="noopener noreferrer">
+        <div className="flex flex-wrap items-center gap-4">
+          <a href={SOCIALS.cv} className="btn btn-secondary" target="_blank" rel="noopener noreferrer">
             Download CV <Arrow dir="down" />
           </a>
-          <Link to="/work" className="btn btn--solid">
+          <Link to="/work" className="btn btn-primary">
             See the work <Arrow />
           </Link>
         </div>
-      </section>
+      </div>
+    </section>
+  )
+}
+
+export default function Experience() {
+  return (
+    <main>
+      <PageHeader
+        eyebrow="Experience"
+        title={
+          <>
+            Four years, one direction.
+            <span className="block text-ai-muted">From diagnosing systems to building them.</span>
+          </>
+        }
+      >
+        I started in support, learning how systems break. Then I moved into building them, and the scope has been
+        widening ever since.
+      </PageHeader>
+      <Arc />
+      <Roles />
+      <Elsewhere />
+      <NextSteps />
     </main>
   )
 }

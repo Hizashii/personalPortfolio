@@ -1,4 +1,4 @@
-import { Arrow, Marker } from './ui'
+import { Arrow, Interval, Marker } from './ui'
 import { Link } from '../router'
 import { PROJECTS } from '../data'
 
@@ -19,9 +19,6 @@ export function Annotation({ children, className = '' }) {
     </p>
   )
 }
-
-// Former name, still imported by the SPECTRE and SpisNem pages until their own redesign.
-export const HandNote = Annotation
 
 function Facts({ items }) {
   return (
@@ -47,7 +44,8 @@ export function CaseHeader({ project, lede, facts, art }) {
         <p className="mt-6 max-w-measure text-lede">{lede}</p>
         <Facts items={facts} />
       </div>
-      <div className="lg:col-span-6 lg:self-center">{art}</div>
+      <div className="min-w-0 lg:col-span-6 lg:self-center">{art}</div>
+      <Interval className="lg:col-span-12">In depth</Interval>
     </header>
   )
 }
@@ -67,6 +65,34 @@ export function CaseSection({ id, n, label, title, children, aside }) {
         <div className="min-w-0 lg:col-span-7">{aside}</div>
       </div>
     </section>
+  )
+}
+
+function CaseBlock({ section, n }) {
+  const { id, label, title, body, note, Visual } = section
+  const aside = (
+    <>
+      <Visual />
+      {note && <Annotation className="mt-5">{note}</Annotation>}
+    </>
+  )
+  return (
+    <CaseSection id={id} n={n} label={label} title={title} aside={aside}>
+      {body.map((paragraph) => (
+        <p key={paragraph}>{paragraph}</p>
+      ))}
+    </CaseSection>
+  )
+}
+
+// The body of a case study: numbered sections from 00, each with its own visual.
+export function CaseSections({ sections }) {
+  return (
+    <div className="wrap grid gap-section">
+      {sections.map((section, i) => (
+        <CaseBlock key={section.id} section={section} n={String(i).padStart(2, '0')} />
+      ))}
+    </div>
   )
 }
 

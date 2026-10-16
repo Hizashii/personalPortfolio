@@ -1,13 +1,10 @@
-import { useEffect } from 'react'
 import { FRAME_FLOW, Flow, LAB_BOUNDARY, MODEL_SEAM, PIPELINE, SectionDrawing } from '../components/drawings'
-import { Annotation, CaseHeader, CaseNext, CaseSection, DetailList, Panel } from '../components/case'
+import { Annotation, CaseHeader, CaseNext, CaseSections, DetailList, Panel } from '../components/case'
 import { Arrow } from '../components/ui'
-import { ApplyerDemo } from '../components/demos'
+import ApplyerDemo from '../components/ApplyerDemo'
 import ShipPipeline from '../components/ship'
 import { PROJECTS } from '../data'
-import { useMedia } from '../hooks'
-
-const useLayout = () => (useMedia('(max-width: 760px)') ? 'narrow' : 'wide')
+import { useDocumentTitle, useFlowLayout } from '../hooks'
 
 const LEDE =
   'A job platform for Denmark. It finds roles that fit you, tailors your CV and cover letter to each one, and applies for you, once you have approved exactly what will be sent.'
@@ -233,7 +230,7 @@ function Strategies() {
 }
 
 function FlowPanel({ spec, label }) {
-  const layout = useLayout()
+  const layout = useFlowLayout()
   return (
     <Panel>
       <Flow spec={spec[layout]} label={label} />
@@ -291,7 +288,7 @@ function FeedGate() {
 }
 
 function Architecture() {
-  const layout = useLayout()
+  const layout = useFlowLayout()
   return (
     <Panel>
       <SectionDrawing narrow={layout === 'narrow'} roomy />
@@ -463,44 +460,12 @@ const SECTIONS = [
   },
 ]
 
-function Section({ section, n }) {
-  const { id, label, title, body, note, Visual } = section
-  return (
-    <CaseSection
-      id={id}
-      n={n}
-      label={label}
-      title={title}
-      aside={
-        <>
-          <Visual />
-          {note && <Annotation className="mt-5">{note}</Annotation>}
-        </>
-      }
-    >
-      {body.map((paragraph) => (
-        <p key={paragraph}>{paragraph}</p>
-      ))}
-    </CaseSection>
-  )
-}
-
 export default function CaseApplyer() {
-  useEffect(() => {
-    document.title = 'Applyer · Lachezar Dimchov'
-    return () => {
-      document.title = 'Lachezar Dimchov, Software Engineer'
-    }
-  }, [])
-
+  useDocumentTitle('Applyer')
   return (
     <main>
       <CaseHeader project={PROJECTS.applyer} lede={LEDE} facts={FACTS} art={<BrowserShot />} />
-      <div className="wrap grid gap-section">
-        {SECTIONS.map((section, i) => (
-          <Section key={section.id} section={section} n={String(i).padStart(2, '0')} />
-        ))}
-      </div>
+      <CaseSections sections={SECTIONS} />
       <CaseNext from="applyer" />
     </main>
   )

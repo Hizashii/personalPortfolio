@@ -306,7 +306,7 @@
   }
 }
 
-/* SPECTRE attack graph (components/demos.jsx), drawn on an indigo surface */
+/* SPECTRE attack graph (components/spectre.jsx), drawn on an indigo surface */
 @layer components {
   .sp-graph {
     display: block;

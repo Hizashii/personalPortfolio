@@ -77,6 +77,40 @@ export function Arrow({ dir = 'right', className = '' }) {
   )
 }
 
+// Stroke icon from a single path, sized to sit beside a label.
+export function Icon({ d, size = 16 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d={d} />
+    </svg>
+  )
+}
+
+// Ma (間): two rules held apart by a deliberate gap, with a small fuji cut in the interval.
+// Used once per case study, where the overview hands over to the technical detail.
+export function Interval({ children, className = '' }) {
+  return (
+    <div className={`flex items-center gap-4 text-meta font-medium text-ai-muted ${className}`}>
+      <span className="flex items-center gap-2.5" aria-hidden="true">
+        <span className="h-0.5 w-8 bg-ai" />
+        <span className="cut h-1.5 w-3 bg-fuji" />
+        <span className="h-0.5 w-8 bg-ai" />
+      </span>
+      {children}
+    </div>
+  )
+}
+
 // Top of an inner page: title on the left, the intro dropped to its baseline on the right.
 export function PageHeader({ eyebrow, title, children }) {
   return (

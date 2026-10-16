@@ -15,6 +15,22 @@ export function useMedia(query) {
 
 export const useReducedMotion = () => useMedia('(prefers-reduced-motion: reduce)')
 
+export const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+// Diagram specs come in a wide and a narrow drawing; this picks one.
+export const useFlowLayout = () => (useMedia('(max-width: 760px)') ? 'narrow' : 'wide')
+
+const SITE_TITLE = 'Lachezar Dimchov, Software Engineer'
+
+export function useDocumentTitle(title) {
+  useEffect(() => {
+    document.title = `${title} · Lachezar Dimchov`
+    return () => {
+      document.title = SITE_TITLE
+    }
+  }, [title])
+}
+
 // Adds `is-drawn` once the element is 35% visible. Used by the line-draw drawings.
 export function useDrawn() {
   const ref = useRef(null)

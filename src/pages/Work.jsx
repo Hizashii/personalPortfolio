@@ -1,5 +1,5 @@
 import { Arrow, Marker, PageHeader, Tags } from '../components/ui'
-import { AttackGraph } from '../components/demos'
+import { AttackGraph } from '../components/spectre'
 import { Link } from '../router'
 import { PROJECTS, SCREENSHOTS } from '../data'
 
