@@ -9,17 +9,16 @@ export function Eyebrow({ children }) {
 }
 
 export function HandNote({ children, className = '', arrow = 'down-left' }) {
-  const d =
-    arrow === 'down-left'
-      ? 'M58 4C40 8 22 18 6 36M14 28l-9 9 12 2'
-      : arrow === 'down-right'
-        ? 'M3 4C22 8 40 18 56 36M48 28l9 9-12 2'
-        : 'M3 40C18 38 32 24 58 6M47 4l12 2-4 11'
+  const paths = {
+    'down-left': 'M58 4C40 8 22 18 6 36M14 28l-9 9 12 2',
+    'down-right': 'M3 4C22 8 40 18 56 36M48 28l9 9-12 2',
+    'up-right': 'M3 40C18 38 32 24 58 6M47 4l12 2-4 11',
+  }
   return (
     <p className={`ce-hand ce-hand--${arrow} hand ${className}`}>
       <span>{children}</span>
       <svg viewBox="0 0 64 44" fill="none" aria-hidden="true">
-        <path d={d} />
+        <path d={paths[arrow] || paths['down-left']} />
       </svg>
     </p>
   )
@@ -30,9 +29,11 @@ export function CaseSection({ id, n, label, title, children, aside, dark = false
   return (
     <section id={id} className={`ce-sec ${dark ? 'ce-sec--dark' : ''}`} aria-labelledby={`${id}-t`}>
       <div className="ce-sec-text">
-        <Eyebrow>
-          {n} <i>/</i> {label}
-        </Eyebrow>
+        {(n || label) && (
+          <Eyebrow>
+            {n} {n && label && <i>/</i>} {label}
+          </Eyebrow>
+        )}
         <h2 id={`${id}-t`} className="ce-h2">
           {title}
         </h2>

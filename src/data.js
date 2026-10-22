@@ -182,3 +182,22 @@ export const TICKER = [
   'Writing code most days',
   'Curious about what happens after localhost',
 ]
+
+// Homepage copy is kept here so presentation components only describe layout.
+export const HOME_CONTENT = {
+  projects: [
+    ['applyer', 'Applyer', 'Finds jobs, writes the application and tracks what happens next.', 'Ongoing'],
+    ['spisnem', 'Spisnem', 'A restaurant queue you can join from the pavement.', 'Beta'],
+    ['minwin', 'MinWin', 'Makes Windows lighter, and measures before it changes anything.', 'Early'],
+  ],
+  principles: [
+    ['Understand the system', 'A good solution fits the whole system, not only the feature in front of me.'],
+    ['Design for reality', 'Requirements change, services fail and people do unexpected things. I plan for that.'],
+    ['Own the outcome', 'I care about what happens in production, not only about the first merge.'],
+  ],
+  roles: [
+    ['2026 to now', 'Full-stack engineer', 'Weblager', 'A large Angular and TypeScript application with complex search, permissions and access rules.'],
+    ['2024 to 2026', 'Full-stack developer', 'Visma Creditro', 'Vue, Node.js and NestJS microservices. Moved caching to Redis for about 2.2x faster cached workflows.'],
+    ['2022 to 2023', 'Support engineer', 'Microsoft 365 and Cisco', 'Enterprise troubleshooting, which taught me to read systems I had not built.'],
+  ],
+}
