@@ -15,6 +15,41 @@ export function useMedia(query) {
 
 export const useReducedMotion = () => useMedia('(prefers-reduced-motion: reduce)')
 
+// Adds a small amount of entrance rhythm to every route without coupling pages to animation code.
+export function usePageReveal(path) {
+  useEffect(() => {
+    const root = document.getElementById('main')
+    if (!root) return undefined
+    const nodes = root.querySelectorAll(
+      'main > header, main > section, main > .wrap, main > .wrap > article, main > .wrap > section, main > .wrap > ol',
+    )
+    if (!nodes.length) return undefined
+
+    nodes.forEach((node, index) => {
+      node.classList.add('reveal-target')
+      node.style.setProperty('--reveal-delay', `${Math.min(index * 55, 275)}ms`)
+    })
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+      nodes.forEach((node) => node.classList.add('is-revealed'))
+      return undefined
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          entry.target.classList.add('is-revealed')
+          observer.unobserve(entry.target)
+        })
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
+    )
+    nodes.forEach((node) => observer.observe(node))
+    return () => observer.disconnect()
+  }, [path])
+}
+
 // Adds `is-drawn` once the element is 35% visible. Used by the line-draw drawings.
 export function useDrawn() {
   const ref = useRef(null)

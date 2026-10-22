@@ -9444,3 +9444,107 @@ body {
     transform: none;
   }
 }
+
+/* Motion pass: restore the portfolio's working-sheet annotations and add route rhythm. */
+.reveal-target {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 720ms var(--ease) var(--reveal-delay, 0ms), transform 720ms var(--ease) var(--reveal-delay, 0ms);
+}
+.reveal-target.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+.hn-hero > .hn-h1,
+.hn-hero-copy > *,
+.hn-show {
+  animation: intro-rise 800ms var(--ease) both;
+}
+.hn-hero-copy > :nth-child(2) { animation-delay: 90ms; }
+.hn-cta { animation-delay: 160ms; }
+.hn-show { animation-delay: 220ms; }
+@keyframes intro-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The line-art and notes are part of the visual language, not noise. */
+.hm-kicker,
+.hm-num,
+.wp-n,
+.ln-index,
+.ln-notes-tags,
+.ln-bar-tags,
+.ab-beat-n,
+.wc-block,
+.wc-note,
+.wp-arrow,
+.hand-arrow,
+.ls-note,
+.mp-note,
+.ln-hand-note,
+.ab-note,
+.ce-hand,
+.hc-note {
+  display: revert !important;
+}
+.ce-hand { display: inline-block !important; }
+.wc-block,
+.wc-note,
+.wp-arrow,
+.hand-arrow,
+.ls-note,
+.mp-note,
+.ln-hand-note,
+.ab-note,
+.hc-note { display: block !important; }
+.ln-tagline svg,
+.ln-how svg { display: block; }
+.ln-card-top span:first-child { display: inline; }
+.ln-card-top { justify-content: space-between; }
+
+.wc-block { opacity: 0.78; }
+.wc-note,
+.ce-hand,
+.hand-arrow,
+.ls-note,
+.mp-note,
+.ln-hand-note,
+.ab-note {
+  animation: note-float 5s ease-in-out infinite;
+}
+@keyframes note-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-4px) rotate(1deg); }
+}
+.wc:hover .wc-block--1,
+.wc:focus-visible .wc-block--1 { transform: translate(-10px, 8px) rotate(-1deg); }
+.wc:hover .wc-block--2,
+.wc:focus-visible .wc-block--2 { transform: translate(10px, -8px) rotate(1deg); }
+.wc:hover .wc-note,
+.wc:focus-visible .wc-note { animation-play-state: paused; }
+.cursor-label {
+  transform-origin: top left;
+  transition: opacity 140ms var(--ease), scale 220ms var(--ease);
+  scale: 0.82;
+}
+.cursor-label.is-on { scale: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-target,
+  .hn-hero > .hn-h1,
+  .hn-hero-copy > *,
+  .hn-show,
+  .wc-note,
+  .ce-hand,
+  .hand-arrow,
+  .ls-note,
+  .mp-note,
+  .ln-hand-note,
+  .ab-note {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

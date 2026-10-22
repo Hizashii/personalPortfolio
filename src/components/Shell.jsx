@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useRouter } from '../router'
 import { NAV, SOCIALS } from '../data'
 import { Arrow } from './ui'
+import { usePageReveal } from '../hooks'
 
 export function CursorLabel() {
   const ref = useRef(null)
@@ -73,6 +74,9 @@ export function SiteFooter() {
 }
 
 export function SiteFrame({ children }) {
+  const { path } = useRouter()
+  usePageReveal(path)
+
   return (
     <>
       <a className="skip" href="#main">Skip to content</a>
