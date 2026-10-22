@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import '@fontsource/caveat/500.css'
 import { Arrow } from '../components/ui'
 import { Link } from '../router'
 import { PROJECTS } from '../data'
@@ -143,19 +142,12 @@ export default function Work() {
   return (
     <main className="wp">
       <header className="wp-head wrap">
-        <p className="hm-kicker">
-          <span className="hm-dot" aria-hidden="true" />
-          Selected work
-        </p>
         <div className="wp-head-row">
           <div>
-            <h1 className="wp-h1">Real products.</h1>
-            <p className="wp-h1-sub">Open one for the thinking behind it.</p>
+            <h1 className="wp-h1">Work</h1>
+            <p className="wp-h1-sub">Three projects, from a team product to a tool I built for myself.</p>
           </div>
-          <p className="wp-intro">
-            These are the main projects I have been building. Different problems, different constraints,
-            but the same goal: software that works in the real world.
-          </p>
+          <p className="wp-intro">Each one has a case study with the screens, the reasoning and, where it makes sense, a working demo you can click through.</p>
         </div>
       </header>
 

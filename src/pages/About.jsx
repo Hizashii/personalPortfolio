@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import '@fontsource-variable/newsreader/wght.css'
-import '@fontsource/caveat/500.css'
 import { Arrow } from '../components/ui'
 import { Link } from '../router'
 import { ABOUT, SOCIALS } from '../data'
@@ -293,10 +291,6 @@ export default function About() {
     <main className="ab">
       <header className="ab-top wrap">
         <div className="ab-top-copy">
-          <p className="hm-kicker">
-            <span className="hm-dot" aria-hidden="true" />
-            About
-          </p>
           <h1 className="ab-h1">
             Hi, I&rsquo;m <span>Lachezar.</span>
           </h1>
@@ -338,7 +332,7 @@ export default function About() {
       {/* The story */}
       <section id="story" className="ab-story wrap" aria-labelledby="story-t">
         <h2 id="story-t" className="hm-h2">
-          <span className="mono hm-num">01</span> How I got here
+          How I got here
         </h2>
         <div className="ab-track" ref={trackRef}>
         <ol className="ab-beats">
@@ -357,7 +351,7 @@ export default function About() {
       {/* Curious about */}
       <section className="ab-cur wrap" aria-labelledby="cur-t">
         <h2 id="cur-t" className="hm-h2">
-          <span className="mono hm-num">02</span> What I keep coming back to
+          What I keep coming back to
         </h2>
         <div className="ab-cur-grid">
           <ul className="ab-chips" role="tablist" aria-label="Things I am curious about">
@@ -392,7 +386,7 @@ export default function About() {
       {/* Right now */}
       <section className="ab-now wrap" aria-labelledby="now-t">
         <h2 id="now-t" className="hm-h2">
-          <span className="mono hm-num">03</span> Right now
+          Right now
         </h2>
         <dl className="ab-now-list">
           {NOW.map(([k, v]) => (

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import '@fontsource/caveat/500.css'
 import { Arrow } from '../components/ui'
 import { Flow, MINWIN_FLOW } from '../components/drawings'
 import { CaseNext, Eyebrow, HandNote } from '../components/case'

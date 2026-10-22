@@ -68,19 +68,12 @@ export default function Experience() {
   return (
     <main className="xp">
       <header className="wp-head wrap">
-        <p className="hm-kicker">
-          <span className="hm-dot" aria-hidden="true" />
-          Experience
-        </p>
         <div className="wp-head-row">
           <div>
-            <h1 className="wp-h1">Four years, one direction.</h1>
-            <p className="wp-h1-sub">From diagnosing systems to building them.</p>
+            <h1 className="wp-h1">Experience</h1>
+            <p className="wp-h1-sub">Support first, then full-stack, and now the systems around it.</p>
           </div>
-          <p className="wp-intro">
-            I started in support, learning how systems break. Then I moved into building them, and the scope
-            has been widening ever since.
-          </p>
+          <p className="wp-intro">Nearly four years in software. The scope has widened each time: from fixing other people’s systems to building my own.</p>
         </div>
       </header>
 

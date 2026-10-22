@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import '@fontsource-variable/newsreader/wght.css'
-import '@fontsource/caveat/500.css'
 import { Flow, PIPELINE } from '../components/drawings'
 import { Arrow } from '../components/ui'
 import { Link } from '../router'
