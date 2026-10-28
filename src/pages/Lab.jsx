@@ -1,504 +1,325 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Flow, PIPELINE } from '../components/drawings'
-import { Arrow } from '../components/ui'
-import { Link } from '../router'
-import { TICKER } from '../data'
-import { useMedia, useReducedMotion } from '../hooks'
+import Obj from '../components/obj'
+import { LAYER_META } from '../data'
+import { SecHead } from '../components/ui'
 
-const MINWIN_STEPS = ['Measure', 'Apply', 'Diff', 'Roll back']
+/* ===========================================================================
+   01 - FLOW FIELD
+   A 2D canvas particle field. Trails are drawn by fading the previous frame,
+   so there is no per-particle history to keep. Stops dead when off-screen.
+   =========================================================================== */
 
-const PRINCIPLES = [
-  {
-    id: 'classify',
-    focus: ['classify'],
-    title: 'Classify',
-    text: 'Understand what failed before reacting.',
-    icon: <path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6" />,
-  },
-  {
-    id: 'recover',
-    focus: ['retry'],
-    title: 'Recover',
-    text: 'Retry transient failures deliberately, with backoff.',
-    icon: <path d="M19 12a7 7 0 1 1-2.2-5.1M19 4v4.5h-4.5" />,
-  },
-  {
-    id: 'handoff',
-    focus: ['manual', 'park'],
-    title: 'Hand off',
-    text: 'When automation is uncertain, a person decides.',
-    icon: <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 21a7.5 7.5 0 0 1 15 0" />,
-  },
-]
-
-function HandArrow({ className = '', d = 'M3 38C16 36 30 22 56 6M45 4l12 2-4 11' }) {
-  return (
-    <svg className={`hand-arrow ${className}`} viewBox="0 0 64 44" fill="none" aria-hidden="true">
-      <path d={d} />
-    </svg>
-  )
-}
-
-// Isometric sketch: ideas as layers, one solid thing underneath. Hover, focus or tap spreads the layers.
-function LayersSketch() {
-  const [open, setOpen] = useState(false)
-  const rhombus = (cx, cy, w, h) => `${cx},${cy - h / 2} ${cx + w / 2},${cy} ${cx},${cy + h / 2} ${cx - w / 2},${cy}`
-  return (
-    <button
-      type="button"
-      className={`ls ${open ? 'is-open' : ''}`}
-      aria-pressed={open}
-      aria-label="Layers sketch: tap to spread the layers apart"
-      onClick={() => setOpen((v) => !v)}
-    >
-      <svg viewBox="0 0 400 340" fill="none" aria-hidden="true">
-        <polygon className="ls-floor" points={rhombus(210, 285, 340, 110)} />
-        <path className="ls-floor-line" d="M210 230L380 285M210 230L40 285M125 257.5L295 312.5M295 257.5L125 312.5" />
-        <line className="ls-axis" x1="230" y1="0" x2="230" y2="336" />
-        <g className="ls-float">
-          <g className="ls-cube">
-            <polygon className="ls-top" points="200,176 238,194 200,212 162,194" />
-            <polygon className="ls-left" points="162,194 200,212 200,256 162,238" />
-            <polygon className="ls-right" points="200,212 238,194 238,238 200,256" />
-          </g>
-          <polygon className="ls-plane ls-plane--3" points={rhombus(235, 136, 250, 96)} />
-          <polygon className="ls-plane ls-plane--2" points={rhombus(235, 104, 250, 96)} />
-          <polygon className="ls-plane ls-plane--1" points={rhombus(235, 72, 250, 96)} />
-        </g>
-      </svg>
-      <span className="ls-note ls-note--list hand" aria-hidden="true">
-        ideas
-        <br />
-        prototypes
-        <br />
-        failed attempts
-        <br />
-        useful lessons
-        <br />…
-        <HandArrow className="ls-arrow ls-arrow--list" d="M3 6C22 6 40 14 52 36M44 30l8 8 4-11" />
-      </span>
-      <span className="ls-note ls-note--quiet hand" aria-hidden="true">
-        a quieter
-        <br />
-        place to
-        <br />
-        explore.
-        <HandArrow className="ls-arrow ls-arrow--quiet" d="M58 4C40 8 22 18 6 36M14 28l-9 9 12 2" />
-      </span>
-    </button>
-  )
-}
-
-// Four agents, one controlled gateway. Click the card to open or close the gateway.
-function AgentNet({ calm }) {
-  const [open, setOpen] = useState(true)
-  const ys = [34, 66, 98, 130]
-  const paths = ys.map((y) => `M26 ${y} C 90 ${y}, 110 82, 168 82`)
-  return (
-    <button
-      type="button"
-      className="an"
-      role="switch"
-      aria-checked={open}
-      aria-label="Controlled gateway between the agents and the outside"
-      onClick={() => setOpen((v) => !v)}
-    >
-      <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
-        {paths.map((d, i) => (
-          <g key={d}>
-            <path className="an-curve" d={d} />
-            <circle className="an-agent" cx="26" cy={ys[i]} r="4.5" />
-            {!calm && (
-              <circle className="an-packet" r="2.8">
-                <animateMotion dur="2.6s" begin={`${i * 0.55}s`} repeatCount="indefinite" path={d} />
-              </circle>
-            )}
-          </g>
-        ))}
-        <line className="an-wall" x1="172" y1="6" x2="172" y2="164" />
-        <rect className={`an-gate ${open ? '' : 'is-closed'}`} x="165" y="64" width="14" height="36" rx="2" />
-        {open ? (
-          <>
-            <path className="an-out" d="M180 82H256" />
-            <circle className="an-world" cx="262" cy="82" r="17" />
-            {!calm && (
-              <circle className="an-packet an-packet--out" r="2.8">
-                <animateMotion dur="1.6s" begin="1.3s" repeatCount="indefinite" path="M180 82H255" />
-              </circle>
-            )}
-          </>
-        ) : (
-          <>
-            <path className="an-out an-out--off" d="M180 82H256" />
-            <circle className="an-world an-world--off" cx="262" cy="82" r="17" />
-            <path className="an-x" d="M158 72l-8 20M150 72l8 20" />
-          </>
-        )}
-      </svg>
-      <span className="an-label an-label--agents" aria-hidden="true">AGENTS</span>
-      <span className="an-label an-label--gate hand" aria-hidden="true">
-        {open ? 'controlled' : 'closed:'}
-        <br />
-        {open ? 'gateway' : 'nothing leaves'}
-        <HandArrow className="an-arrow" d="M3 38C14 36 26 24 40 6M30 4l11 1-2 11" />
-      </span>
-      <span className="an-state" aria-hidden="true">
-        gateway {open ? 'open' : 'closed'}
-      </span>
-    </button>
-  )
-}
-
-// The real image, with the four steps cycling over it.
-function MinWinPanel({ calm }) {
-  const [i, setI] = useState(0)
-  useEffect(() => {
-    if (calm) return
-    const t = setInterval(() => setI((n) => (n + 1) % MINWIN_STEPS.length), 2200)
-    return () => clearInterval(t)
-  }, [calm])
-  return (
-    <button
-      type="button"
-      className="mw"
-      aria-label={`MinWin loop, step ${i + 1}: ${MINWIN_STEPS[i]}. Tap for the next step.`}
-      onClick={() => setI((n) => (n + 1) % MINWIN_STEPS.length)}
-    >
-      <img src="/assets/minwin/minwin-stage.webp" alt="" width="1600" height="1000" loading="lazy" />
-      <span className="mw-steps2" aria-hidden="true">
-        {MINWIN_STEPS.map((s, k) => (
-          <span key={s} className={k === i ? 'is-on' : ''}>
-            <b>{k + 1}</b> {s}
-          </span>
-        ))}
-      </span>
-    </button>
-  )
-}
-
-// A model picker that swaps what is behind it without changing the interface.
-function ModelPanel() {
-  const [local, setLocal] = useState(false)
-  return (
-    <button
-      type="button"
-      className={`mp ${local ? 'is-local' : ''}`}
-      role="switch"
-      aria-checked={local}
-      aria-label="Swap the model behind the interface"
-      onClick={() => setLocal((v) => !v)}
-    >
-      <span className="mp-select">
-        <span className="mp-value" key={local ? 'l' : 'g'}>
-          {local ? 'Local model' : 'Gemini 2.5 Flash'}
-        </span>
-        <svg viewBox="0 0 12 8" width="12" height="8" fill="none" aria-hidden="true">
-          <path d="M1 1.5l5 5 5-5" />
-        </svg>
-      </span>
-      <span className="mp-row">
-        <svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true">
-          <circle cx="10" cy="10" r="7.5" />
-          <path d="M6.5 10h7M10.5 7l3 3-3 3" />
-        </svg>
-        Tap to swap model
-      </span>
-      <span className="mp-note hand" aria-hidden="true">
-        local models.
-        <br />
-        same interface.
-        <HandArrow className="mp-arrow" d="M58 38C46 36 30 26 8 6M18 4L7 6l3 11" />
-      </span>
-    </button>
-  )
-}
-
-function Ticker({ calm }) {
-  const [i, setI] = useState(0)
-  useEffect(() => {
-    if (calm) return
-    const t = setInterval(() => setI((n) => (n + 1) % TICKER.length), 3400)
-    return () => clearInterval(t)
-  }, [calm])
-  return (
-    <p className="lt">
-      <span className="lt-dot" aria-hidden="true" />
-      <span className="lt-label">Right now</span>
-      <span className="lt-win">
-        <span key={i} className="lt-text mono">
-          {TICKER[i]}.
-        </span>
-      </span>
-    </p>
-  )
-}
-
-// Topographic lines for the dark section. They drift as the section scrolls past.
-// Cheap by design: only runs while visible, one rAF per frame, no layout reads while scrolling.
-function Contours() {
+function FlowField() {
   const ref = useRef(null)
-  const lines = useMemo(() => {
-    const out = []
-    for (let i = 0; i < 20; i++) {
-      let p = ''
-      for (let x = 0; x <= 640; x += 10) {
-        const env = Math.exp(-Math.pow((x - 430) / 190, 2))
-        const y =
-          190 +
-          i * 11 -
-          env * (70 + i * 1.5) +
-          Math.sin(x * 0.021 + i * 0.5) * 9 * (0.4 + env) +
-          Math.sin(x * 0.047 + i * 0.9) * 4
-        p += `${x === 0 ? 'M' : 'L'}${x} ${y.toFixed(1)}`
-      }
-      // each line drifts a little differently, so the field seems to flow rather than slide
-      const dir = i % 2 ? 1 : -1
-      out.push({ d: p, dx: dir * (14 + i * 1.6), dy: (i - 9.5) * 1.3 })
-    }
-    return out
-  }, [])
+  const [paused, setPaused] = useState(false)
+  const pausedRef = useRef(false)
+  useEffect(() => {
+    pausedRef.current = paused
+  }, [paused])
 
   useEffect(() => {
-    const svg = ref.current
-    const section = svg?.closest('section')
-    if (!svg || !section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const canvas = ref.current
+    if (!canvas) return undefined
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return undefined
 
-    let top = 0
-    let height = 0
-    let vh = window.innerHeight
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const COUNT = window.matchMedia('(max-width: 720px)').matches ? 320 : 620
+    const LINE = '#4d59ed'
+
+    let w = 0
+    let h = 0
+    let dpr = 1
     let raf = 0
-    let live = false
+    let visible = true
+    let t = 0
+    const pts = new Float32Array(COUNT * 2)
+    const age = new Float32Array(COUNT)
 
-    const measure = () => {
-      const r = section.getBoundingClientRect()
-      top = r.top + window.scrollY
-      height = r.height
-      vh = window.innerHeight
-    }
-    const update = () => {
-      raf = 0
-      const p = (window.scrollY + vh - top) / (vh + height)
-      svg.style.setProperty('--p', Math.min(1, Math.max(0, p)).toFixed(4))
-    }
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    const start = () => {
-      if (live) return
-      live = true
-      measure()
-      update()
-      window.addEventListener('scroll', onScroll, { passive: true })
-    }
-    const stop = () => {
-      live = false
-      window.removeEventListener('scroll', onScroll)
-      cancelAnimationFrame(raf)
-      raf = 0
+    function seed(i) {
+      pts[i * 2] = Math.random() * w
+      pts[i * 2 + 1] = Math.random() * h
+      age[i] = Math.random() * 260
     }
 
-    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { rootMargin: '10% 0px' })
-    io.observe(section)
-    const ro = new ResizeObserver(() => live && (measure(), update()))
-    ro.observe(section)
+    function resize() {
+      const rect = canvas.getBoundingClientRect()
+      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const nw = Math.round(rect.width * dpr)
+      const nh = Math.round(rect.height * dpr)
+      if (nw === w && nh === h) return
+      w = nw
+      h = nh
+      canvas.width = w
+      canvas.height = h
+      ctx.fillStyle = '#f4f0e7'
+      ctx.fillRect(0, 0, w, h)
+      for (let i = 0; i < COUNT; i += 1) seed(i)
+    }
+
+    // Cheap, smooth, deterministic - no noise library needed.
+    function angleAt(x, y, time) {
+      const s = 0.0022
+      return (
+        Math.sin(x * s + time) * 1.6 +
+        Math.cos(y * s * 1.3 - time * 0.7) * 1.6 +
+        Math.sin((x + y) * s * 0.5 + time * 0.4) * 1.2
+      )
+    }
+
+    function step() {
+      ctx.fillStyle = 'rgba(244, 240, 231, 0.045)'
+      ctx.fillRect(0, 0, w, h)
+
+      ctx.strokeStyle = LINE
+      ctx.lineWidth = 1.15 * dpr
+      ctx.globalAlpha = 0.8
+      ctx.beginPath()
+
+      for (let i = 0; i < COUNT; i += 1) {
+        const x = pts[i * 2]
+        const y = pts[i * 2 + 1]
+        const a = angleAt(x, y, t)
+        const nx = x + Math.cos(a) * 1.9 * dpr
+        const ny = y + Math.sin(a) * 1.9 * dpr
+        ctx.moveTo(x, y)
+        ctx.lineTo(nx, ny)
+        pts[i * 2] = nx
+        pts[i * 2 + 1] = ny
+        age[i] += 1
+        if (age[i] > 320 || nx < 0 || ny < 0 || nx > w || ny > h) seed(i)
+      }
+
+      ctx.stroke()
+      ctx.globalAlpha = 1
+      t += 0.0019
+    }
+
+    function frame() {
+      resize()
+      if (!pausedRef.current) step()
+      raf = requestAnimationFrame(frame)
+    }
+
+    resize()
+    if (reduced) {
+      for (let i = 0; i < 320; i += 1) step()
+      return undefined
+    }
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        visible = e.isIntersecting
+        if (visible && !raf) raf = requestAnimationFrame(frame)
+        if (!visible && raf) {
+          cancelAnimationFrame(raf)
+          raf = 0
+        }
+      },
+      { threshold: 0.01 },
+    )
+    io.observe(canvas)
+
     return () => {
+      if (raf) cancelAnimationFrame(raf)
       io.disconnect()
-      ro.disconnect()
-      stop()
     }
   }, [])
 
   return (
-    <svg
-      ref={ref}
-      className="ln-contours"
-      viewBox="0 0 640 420"
-      fill="none"
-      aria-hidden="true"
-      preserveAspectRatio="xMaxYMid slice"
-    >
-      {lines.map((ln, i) => (
-        <path key={i} d={ln.d} style={{ opacity: 0.1 + (i / 20) * 0.16, '--dx': ln.dx, '--dy': ln.dy }} />
-      ))}
-    </svg>
+    <>
+      <canvas ref={ref} className="w-full h-full block" aria-hidden="true" />
+      <button
+        type="button"
+        className="absolute bottom-4 right-4 chip chip--solid"
+        onClick={() => setPaused((v) => !v)}
+      >
+        {paused ? 'Resume' : 'Pause'}
+      </button>
+    </>
   )
 }
+
+/* ===========================================================================
+   03 - VARIABLE AXES
+   Martian Mono has a width axis as well as a weight axis. The display type on
+   this site is set at wdth 87.5–95; this is the rest of the range.
+   =========================================================================== */
+
+function Axes() {
+  const [wght, setWght] = useState(700)
+  const [wdth, setWdth] = useState(85)
+
+  return (
+    <div className="flex flex-col h-full">
+      <p
+        className="flex-1 grid place-items-center text-center px-2 py-6 leading-[0.95]"
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontWeight: wght,
+          fontVariationSettings: `'wdth' ${wdth}`,
+          fontSize: 'clamp(1.8rem, 5.4vw, 3.4rem)',
+          letterSpacing: '-0.04em',
+        }}
+      >
+        Handgloves
+      </p>
+
+      <div className="grid gap-4 pt-5 border-t-2 border-[var(--ink)]">
+        <label className="grid gap-2">
+          <span className="t-micro flex justify-between">
+            <span>Weight</span>
+            <span className="tabular-nums">{wght}</span>
+          </span>
+          <input
+            type="range"
+            aria-label="Weight axis"
+            min="100"
+            max="800"
+            step="10"
+            value={wght}
+            onChange={(e) => setWght(+e.target.value)}
+          />
+        </label>
+        <label className="grid gap-2">
+          <span className="t-micro flex justify-between">
+            <span>Width</span>
+            <span className="tabular-nums">{wdth}</span>
+          </span>
+          <input
+            type="range"
+            aria-label="Width axis"
+            min="75"
+            max="112"
+            step="0.5"
+            value={wdth}
+            onChange={(e) => setWdth(+e.target.value)}
+          />
+        </label>
+      </div>
+    </div>
+  )
+}
+
+/* ========================================================================= */
 
 export default function Lab() {
-  const narrow = useMedia('(max-width: 760px)')
-  const calm = useReducedMotion()
-  const m = narrow ? 'narrow' : 'wide'
-  const [focus, setFocus] = useState([])
+  const [active, setActive] = useState(-1)
+  const [exploded, setExploded] = useState(false)
+  const stackState = useMemo(() => ({ active, exploded }), [active, exploded])
 
   return (
-    <main className="ln">
-      {/* Lab */}
-      <section id="lab" className="ln-lab wrap" aria-labelledby="lab-title">
-        <div className="ln-lab-head">
-          <div className="ln-lab-copy">
-            <p className="ln-index mono">
-              01 <span aria-hidden="true" />
-            </p>
-            <h1 id="lab-title" className="ln-h1">
-              Lab
-            </h1>
-            <p className="ln-tagline hand">
-              Experiments, not shipped products.
-              <svg viewBox="0 0 280 12" fill="none" aria-hidden="true">
-                <path className="ln-draw" d="M2 8C60 2 170 3 278 4" />
-              </svg>
-            </p>
-            <p className="ln-intro">Where I try things before I know whether they will work.</p>
-            <p className="ln-lede">
-              A working bench for ideas, prototypes and curious problems. Some of these will turn into real
-              products. Most won&rsquo;t. That&rsquo;s the point.
-            </p>
-          </div>
-          <LayersSketch />
-        </div>
-
-        <ul className="ln-cards">
-          <li className="ln-card">
-            <p className="ln-card-top mono">
-              <span>01</span>
-              <span className="ln-status">
-                <i className="ln-status-dot" aria-hidden="true" /> In progress
-              </span>
-            </p>
-            <div className="ln-panel">
-              <AgentNet calm={calm} />
+    <>
+      <section className="board pt-[clamp(14px,2vw,26px)]">
+        <div className="panel panel--ink" data-rise>
+          <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-end">
+            <div>
+              <h1 className="t-display-xl" style={{ fontSize: 'clamp(2.2rem,5.4vw,4rem)' }}>
+                Things I made
+                <br />
+                to find out.
+              </h1>
+              <p className="t-lede sub mt-8">
+                Small pieces with no product attached. Each one runs here, in the page, and
+                stops the moment it scrolls out of sight.
+              </p>
             </div>
-            <h2 className="ln-card-title">Offline agent network</h2>
-            <p className="ln-card-text">
-              Agents process personal data locally. Network access passes through one controlled gateway.
-            </p>
-            <p className="ln-hint">Click the diagram to open or close the gateway.</p>
-          </li>
-
-          <li className="ln-card">
-            <p className="ln-card-top mono">
-              <span>02</span>
-              <span className="ln-status">
-                Early <i className="ln-status-ring" aria-hidden="true" />
-              </span>
-            </p>
-            <div className="ln-panel ln-panel--img">
-              <MinWinPanel calm={calm} />
-            </div>
-            <h2 className="ln-card-title">
-              <Link to="/minwin" className="ln-card-link">
-                MinWin <Arrow dir="ne" />
-              </Link>
-            </h2>
-            <p className="ln-card-text">A Windows tool in Rust that measures before it changes anything.</p>
-            <p className="ln-hint">The loop every change goes through. Tap to step.</p>
-          </li>
-
-          <li className="ln-card">
-            <p className="ln-card-top mono">
-              <span>03</span>
-              <span className="ln-status">
-                <i className="ln-status-dot" aria-hidden="true" /> In progress
-              </span>
-            </p>
-            <div className="ln-panel">
-              <ModelPanel />
-            </div>
-            <h2 className="ln-card-title">Local models</h2>
-            <p className="ln-card-text">
-              Training local models to take over the job the cloud model does today, behind the same
-              interface.
-            </p>
-            <p className="ln-hint">Tap the picker to swap the model.</p>
-          </li>
-        </ul>
-
-        <div className="ln-bar">
-          <Ticker calm={calm} />
-          <p className="ln-bar-tags mono" aria-hidden="true">
-            Ideas / Prototypes / Experiments / Iteration
-          </p>
-        </div>
-      </section>
-
-      {/* Notes */}
-      <section id="notes" className="ln-notes" aria-labelledby="notes-title">
-        <Contours />
-        <div className="wrap ln-notes-in">
-          <div className="ln-notes-top">
-            <p className="ln-index mono">
-              02 <span aria-hidden="true" />
-            </p>
-            <p className="ln-notes-tags mono" aria-hidden="true">
-              Principles / Observations / Hard-earned lessons
-            </p>
-          </div>
-          <div className="ln-notes-head">
-            <h2 id="notes-title" className="ln-h2">
-              Notes
-            </h2>
-            <p className="ln-how hand">
-              How I think
-              <svg viewBox="0 0 120 10" fill="none" aria-hidden="true">
-                <path className="ln-draw" d="M2 6C30 2 80 3 118 4" />
-              </svg>
-            </p>
-          </div>
-          <p className="ln-quote">
-            A failure is data,
-            <br />
-            not an exception.
-          </p>
-          <p className="ln-hand-note hand" aria-hidden="true">
-            real systems
-            <br />
-            are messy.
-            <br />
-            design for it.
-            <HandArrow className="ln-hand-arrow" d="M3 6C20 6 42 16 56 38M46 30l9 9 4-12" />
-          </p>
-          <p className="ln-notes-lede">
-            Support taught me to start from what breaks. So I design for the failure first, and nothing
-            fails silently.
-          </p>
-
-          <ol className="ln-principles">
-            {PRINCIPLES.map((p, i) => (
-              <li
-                key={p.id}
-                tabIndex={0}
-                onMouseEnter={() => setFocus(p.focus)}
-                onMouseLeave={() => setFocus([])}
-                onFocus={() => setFocus(p.focus)}
-                onBlur={() => setFocus([])}
-              >
-                <span className="ln-p-n mono">0{i + 1}</span>
-                <svg className="ln-p-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  {p.icon}
-                </svg>
-                <div>
-                  <h3 className="ln-p-t">{p.title}</h3>
-                  <p className="ln-p-d">{p.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-
-          <div className="ln-diagram">
-            <Flow
-              dark
-              focus={focus}
-              spec={PIPELINE.failure[m]}
-              label="Failure handling: a failed submission is classified, then retried, parked or sent to a person"
-            />
-            <p className="ln-diagram-cap mono">
-              What Applyer does when an attempt fails.
-              <br />
-              Red marks the decisions. Hover or tap a principle to find it here.
+            <p className="t-data sub">
+              Everything on this site is drawn in the browser. The object on the homepage is
+              WebGL, the field below is 2D canvas, and the project objects are SVG. There are no
+              images of graphics anywhere.
             </p>
           </div>
         </div>
       </section>
-    </main>
+
+      <section className="section board">
+        <SecHead index="01" title="Flow field" aside="2D canvas" />
+        <div className="panel panel--cream panel--flush relative h-[min(62vh,560px)]" data-rise>
+          <FlowField />
+        </div>
+        <p className="t-data dim mt-4 max-w-[62ch]">
+          Six hundred particles following a field built from three sine waves. Trails come from
+          fading the previous frame rather than storing history, which keeps it to one path per
+          frame.
+        </p>
+      </section>
+
+      <section className="section board">
+        <SecHead index="02" title="The stack, unlocked" aside="WebGL" />
+        <div className="grid gap-[var(--gap)] lg:grid-cols-[1fr_380px]">
+          <div className="panel panel--blue panel--flush relative min-h-[420px]" data-rise>
+            <div className="absolute inset-0 p-6">
+              <Obj
+                rig="stack"
+                spin
+                state={stackState}
+                label="Six stacked slabs, one for each layer of the stack."
+                onToggle={() => setExploded((v) => !v)}
+                className="h-full"
+              />
+            </div>
+          </div>
+
+          <div className="panel panel--paper flex flex-col" data-rise>
+            <h3 className="t-label">Controls</h3>
+            <ul className="mt-4 -mx-[10px]" onMouseLeave={() => setActive(-1)}>
+              {LAYER_META.map((l, i) => (
+                <li key={l.key}>
+                  <button
+                    type="button"
+                    className="layer-row"
+                    data-on={active === i}
+                    onMouseEnter={() => setActive(i)}
+                    onFocus={() => setActive(i)}
+                    onBlur={() => setActive(-1)}
+                    onClick={() => setActive(active === i ? -1 : i)}
+                    aria-pressed={active === i}
+                  >
+                    <span className="tabular-nums opacity-55">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span className="truncate">{l.name}</span>
+                    <span className="layer-leader" aria-hidden="true" />
+                    <span className="layer-dot" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              className="btn mt-auto w-full"
+              onClick={() => setExploded((v) => !v)}
+            >
+              {exploded ? 'Reassemble' : 'Take it apart'}
+            </button>
+          </div>
+        </div>
+        <p className="t-data dim mt-4 max-w-[62ch]">
+          Raw WebGL: one program, one buffer, two draw calls. The ink outline is a silhouette
+          pass drawn with the depth test off, so every box keeps its own rim even where two of
+          them overlap.
+        </p>
+      </section>
+
+      <section className="section board">
+        <SecHead index="03" title="Variable axes" aside="Martian Mono" />
+        <div className="grid gap-[var(--gap)] lg:grid-cols-[1fr_1fr]">
+          <div className="panel panel--lime" data-rise>
+            <Axes />
+          </div>
+          <div className="panel panel--sand flex flex-col justify-center" data-rise>
+            <p className="t-body sub">
+              The display face on this site has a width axis as well as a weight axis. Long
+              headlines are set narrower so they keep their scale instead of shrinking, which is
+              the whole reason a monospace can carry a headline at all.
+            </p>
+            <p className="t-data sub mt-5">
+              Display: wdth 87.5–95, wght 700–800. Labels: wdth 100, wght 400–500.
+            </p>
+          </div>
+        </div>
+      </section>
+    </>
   )
 }

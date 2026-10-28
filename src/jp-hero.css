@@ -1,0 +1,583 @@
+/* ===========================================================================
+   THE NOREN HERO
+   A roof with cloth banners hanging from its eave. The roof is a real 3D
+   model; the banners are live DOM so their text is selectable, linkable and
+   responsive, and so they can move independently of the roof.
+   =========================================================================== */
+
+.jp-hero {
+  position: relative;
+  min-height: min(100svh, 920px);
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(130% 90% at 50% 0%, #efeae4 0%, var(--wall) 58%, #d9d2cb 100%);
+  overflow: hidden;
+  isolation: isolate;
+
+  /* Where the eave sits, and therefore where every banner hangs from. */
+  --eave: clamp(188px, 30vh, 320px);
+  --banner-h: clamp(210px, 38vh, 420px);
+}
+
+.jp-bar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: clamp(16px, 2.4vw, 30px) clamp(16px, 4vw, 54px);
+}
+
+.jp-mark {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 1.22rem;
+  letter-spacing: -0.06em;
+  color: var(--sumi);
+  text-decoration: none;
+}
+.jp-mark i {
+  color: var(--vermilion);
+  font-style: normal;
+}
+
+.jp-nav {
+  display: flex;
+  gap: clamp(14px, 2.4vw, 40px);
+  margin-inline: auto;
+}
+
+.jp-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sumi-2);
+  text-decoration: none;
+  padding: 8px 3px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  transition: color 0.3s var(--jp-ease);
+}
+
+.jp-nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: var(--vermilion);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--jp-ease);
+}
+
+@media (hover: hover) {
+  .jp-nav a:hover {
+    color: var(--sumi);
+  }
+  .jp-nav a:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+.jp-place {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sumi-2);
+}
+
+.jp-place::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vermilion);
+}
+
+/* --------------------------------------------------------------- the roof */
+
+.jp-roof {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: calc(var(--eave) + 40px);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.jp-roof canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Until the model is in place, a plain eave beam holds the banners up so the
+   composition reads rather than breaking. */
+.jp-roof--pending {
+  display: grid;
+  align-items: end;
+}
+
+.jp-beam {
+  height: clamp(26px, 3vw, 42px);
+  margin-inline: auto;
+  width: min(1140px, 90vw);
+  background: linear-gradient(180deg, var(--wood) 0%, var(--wood-dk) 62%, #2e2114 100%);
+  border-radius: 3px;
+  box-shadow: 0 10px 26px rgb(40 28 14 / 0.3);
+}
+
+/* ------------------------------------------------------------- the banners */
+
+.jp-norens {
+  position: absolute;
+  z-index: 3;
+  top: var(--eave);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1080px, 88vw);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(8px, 1.1vw, 18px);
+  align-items: start;
+}
+
+.jp-noren {
+  position: relative;
+  height: var(--banner-h);
+  background: linear-gradient(177deg, #f7f4ef 0%, #ece6dd 46%, #ded6ca 100%);
+  color: var(--sumi);
+  border-radius: 1px 1px 3px 3px;
+  padding: clamp(14px, 1.6vw, 22px) clamp(8px, 0.9vw, 14px) clamp(26px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: 50% 0%;
+  animation: jp-sway 7s ease-in-out infinite;
+  animation-delay: calc(var(--n) * -1.15s);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.5),
+    0 18px 30px rgb(60 46 30 / 0.16);
+  text-decoration: none;
+  /* The cloth falls away from the eave rather than hanging dead straight. */
+  clip-path: polygon(0 0, 100% 0, 100% 96%, 50% 100%, 0 96%);
+}
+
+.jp-noren--accent {
+  background: linear-gradient(177deg, var(--vermilion) 0%, #c43f2b 52%, var(--vermilion-dk) 100%);
+  color: #fff;
+}
+
+/* A woven tooth, so the cloth is not flat colour. */
+.jp-noren::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: repeating-linear-gradient(90deg, rgb(0 0 0 / 0.028) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.02) 0 1px, transparent 1px 4px);
+}
+
+@keyframes jp-sway {
+  0%,
+  100% {
+    transform: rotate(-0.45deg);
+  }
+  50% {
+    transform: rotate(0.5deg);
+  }
+}
+
+.jp-noren-text {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-variation-settings: 'wdth' 88;
+  font-size: clamp(1.15rem, 2.5vw, 2.1rem);
+  letter-spacing: -0.035em;
+  line-height: 1;
+  margin: 0;
+}
+
+.jp-noren--accent .jp-noren-text {
+  font-size: clamp(1rem, 2.1vw, 1.75rem);
+}
+
+.jp-noren-pair {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: clamp(4px, 0.5vw, 9px);
+}
+
+.jp-noren-sub {
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin: 0 0 0 4px;
+}
+
+.jp-noren-list {
+  font-family: var(--font-mono);
+  font-size: clamp(0.58rem, 0.8vw, 0.72rem);
+  line-height: 1.95;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sumi-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  align-self: stretch;
+}
+
+.jp-noren-num {
+  position: absolute;
+  bottom: clamp(10px, 1.3vw, 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  opacity: 0.5;
+}
+
+.jp-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--vermilion);
+  margin-top: 10px;
+}
+
+/* -------------------------------------------------------------- hero rails */
+
+.jp-rail {
+  position: absolute;
+  z-index: 4;
+  top: calc(var(--eave) + 26px);
+  max-width: 15ch;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  line-height: 1.9;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--sumi-2);
+}
+
+.jp-rail--l {
+  left: clamp(16px, 4vw, 54px);
+  border-left: 1px solid rgb(22 21 15 / 0.3);
+  padding-left: 13px;
+}
+
+.jp-rail--r {
+  right: clamp(16px, 4vw, 54px);
+  text-align: right;
+}
+
+.jp-scroll-line {
+  width: 1px;
+  height: 56px;
+  background: rgb(22 21 15 / 0.3);
+  margin: 14px 0 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.jp-scroll-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--vermilion);
+  animation: jp-scroll 2.4s ease-in-out infinite;
+}
+
+@keyframes jp-scroll {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.jp-hero-foot {
+  position: relative;
+  z-index: 4;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: clamp(18px, 2.6vw, 34px) clamp(16px, 4vw, 54px);
+}
+
+.jp-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.jp-cta-label {
+  background: #fff;
+  color: var(--sumi);
+  border-radius: 999px;
+  padding: 15px 30px 13px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  box-shadow: 0 6px 18px rgb(60 46 30 / 0.16);
+  transition:
+    transform 0.4s var(--jp-ease),
+    background-color 0.3s var(--jp-ease);
+}
+
+.jp-cta-arrow {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--sumi);
+  color: #fff;
+  transition:
+    transform 0.45s var(--jp-ease),
+    background-color 0.3s var(--jp-ease);
+}
+
+@media (hover: hover) {
+  .jp-cta:hover .jp-cta-label {
+    transform: translateX(-4px);
+  }
+  .jp-cta:hover .jp-cta-arrow {
+    transform: translateX(5px);
+    background: var(--vermilion);
+  }
+}
+
+.jp-cta:focus-visible {
+  outline: 3px solid var(--vermilion);
+  outline-offset: 5px;
+  border-radius: 999px;
+}
+
+.jp-tagline {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--sumi-2);
+}
+
+.jp-tagline::after {
+  content: '';
+  width: clamp(40px, 7vw, 120px);
+  height: 1px;
+  background: rgb(22 21 15 / 0.3);
+}
+
+/* -------------------------------------------------- credit for the 3D roof */
+
+.jp-credit {
+  position: relative;
+  z-index: 4;
+  padding: 0 clamp(16px, 4vw, 54px) 14px;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sumi-3);
+}
+
+.jp-credit a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+/* -------------------------------------------------------------- responsive */
+
+@media (max-width: 860px) {
+  .jp-hero {
+    --eave: clamp(150px, 24vh, 230px);
+    --banner-h: clamp(190px, 32vh, 300px);
+  }
+  .jp-rail--l,
+  .jp-rail--r {
+    display: none;
+  }
+  .jp-bar {
+    flex-wrap: wrap;
+    row-gap: 12px;
+  }
+  .jp-nav {
+    order: 3;
+    width: 100%;
+    margin-inline: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 20px;
+    padding-bottom: 2px;
+  }
+  .jp-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .jp-nav a {
+    flex: 0 0 auto;
+  }
+  .jp-place {
+    margin-left: auto;
+  }
+  .jp-norens {
+    width: 92vw;
+    gap: 6px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .jp-hero {
+    min-height: calc(var(--eave) + var(--banner-h) + 170px);
+  }
+  /* The two explanatory banners fold away rather than shrinking to nothing. */
+  .jp-noren--extra {
+    display: none;
+  }
+  .jp-hero-foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .jp-noren-text {
+    font-size: clamp(1.1rem, 6vw, 1.7rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jp-noren {
+    animation: none;
+  }
+  .jp-scroll-line::after {
+    animation: none;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------ closing strip */
+
+.jp-close {
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-top: clamp(56px, 7vw, 104px);
+  border-top: 1px solid rgb(22 21 15 / 0.16);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+
+.jp-close-note {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: -0.01em;
+  color: var(--sumi-2);
+  margin: 18px 0 0;
+  max-width: 40ch;
+}
+
+.jp-close-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.jp-close-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.jp-close-list a {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sumi-2);
+  text-decoration: underline;
+  text-decoration-color: rgb(22 21 15 / 0.25);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 5px;
+  padding-block: 7px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.3s var(--jp-ease), text-decoration-color 0.3s var(--jp-ease);
+}
+
+@media (hover: hover) {
+  .jp-close-list a:hover {
+    color: var(--vermilion);
+    text-decoration-color: var(--vermilion);
+  }
+}
+
+/* Courtyard light and wind, inspired by ILoveJapan. */
+.jp-hero { --eave: clamp(230px, 34vw, 370px); --banner-h: clamp(280px, 30vw, 405px); min-height: max(820px, 95svh); background: radial-gradient(ellipse at 75% 20%, #f1e6d6, transparent 65%), linear-gradient(115deg, #baaa97, #e2d5c3 55%, #b5a28c); }
+.jp-atmosphere { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.jp-tree-shadow { position: absolute; inset: -20%; opacity: .24; filter: blur(13px); background: repeating-conic-gradient(from 22deg at 85% 15%, transparent 0deg 16deg, #514535 18deg 21deg, transparent 23deg 42deg); transform-origin: top right; animation: courtyard-shadow 14s ease-in-out infinite alternate; }
+.jp-ground { position: absolute; bottom: 0; width: 100%; height: 75px; border-top: 2px solid #a48c70; background: repeating-linear-gradient(95deg, transparent 0 170px, #64594b 172px 174px, transparent 176px 290px), repeating-linear-gradient(0deg, #a79780 0 21px, #726859 23px 25px, #c2b49c 27px 49px); box-shadow: 0 -25px 65px #51433155; transform: perspective(400px) rotateX(25deg) scale(1.15); transform-origin: bottom; }
+.jp-maple-branch { position: absolute; top: -35px; left: -45px; width: clamp(160px, 23vw, 350px); filter: blur(1.8px) drop-shadow(8px 20px 10px #543b2844); transform-origin: top left; animation: courtyard-shadow 12s ease-in-out infinite alternate; }
+.jp-lantern { position: absolute; left: -18px; bottom: 90px; width: 94px; height: 178px; border: 10px solid #493324; background: radial-gradient(#ffe6aa, #e6b36c); box-shadow: 0 0 55px #ffd08b66, inset 0 0 25px #986b37; }
+.jp-lantern::before, .jp-lantern::after { content: ''; position: absolute; left: -18px; right: -18px; height: 9px; background: #382b22; top: 12px; }
+.jp-lantern::after { top: auto; bottom: 12px; }
+.jp-lantern i { position: absolute; left: 48%; height: 100%; width: 5px; background: #493324; }
+.jp-falling-leaf { position: absolute; left: var(--x); top: -50px; width: var(--size); height: var(--size); fill: #ae3928; filter: drop-shadow(3px 6px 4px #48251533); animation: courtyard-leaf var(--duration) linear var(--delay) infinite; }
+.jp-falling-leaf:nth-child(3n) { fill: #ca5035; filter: blur(1px); }
+.jp-noren { background-color: #e1cdb0; background-image: linear-gradient(95deg, #5b3e222b, #fff6df66 24%, transparent 45%, #61442826 70%, #fff5da55), linear-gradient(#88715466, transparent 22%, #f5e1bf55 80%, #a3886844); animation-name: courtyard-cloth; animation-duration: 9s; border-bottom: 2px solid #b4a088; }
+.jp-noren--accent { background-color: #a92d21; background-image: linear-gradient(95deg, #49140a44, #ed785744 30%, transparent 50%, #53150d33 75%, #f4825044); border-bottom-color: #832d22; }
+.jp-noren::after { opacity: .7; }
+@keyframes courtyard-cloth { 0%,100% { transform: perspective(900px) rotateX(-2deg) rotate(-1deg) skewX(-.6deg); } 40% { transform: perspective(900px) rotateX(5deg) rotate(1.4deg) skewX(1deg); } 70% { transform: perspective(900px) rotateX(1deg) rotate(.3deg); } }
+@keyframes courtyard-shadow { to { transform: rotate(3deg) translateX(12px); } }
+@keyframes courtyard-leaf { 0% { transform: translate3d(-50px,0,0) rotate(0deg); opacity: 0; } 5% { opacity: .9; } 35% { transform: translate3d(45px,300px,0) rotate(150deg) rotateY(50deg); } 70% { transform: translate3d(-25px,600px,0) rotate(290deg) rotateY(-35deg); } 90% { transform: translate3d(100px,780px,0) rotate(390deg) rotateX(65deg); opacity: .85; } 100% { transform: translate3d(110px,785px,0) rotate(395deg) rotateX(70deg); opacity: 0; } }
+@media (max-width: 700px) { .jp-hero { --eave: 230px; --banner-h: 310px; min-height: 700px; } .jp-maple-branch { opacity: .65; } .jp-lantern { width: 55px; height: 110px; bottom: 65px; } .jp-falling-leaf:nth-child(n+11) { display: none; } }
+@media (prefers-reduced-motion: reduce) { .jp-tree-shadow, .jp-maple-branch, .jp-noren { animation: none; } .jp-falling-leaf { display: none; } }
+
+/* One shared eave coordinate keeps the roof, rail and cloth joined. */
+.jp-roof { inset: 55px auto auto 50%; transform: translateX(-50%); width: min(1230px, 98vw); height: calc(var(--eave) - 43px); }
+.jp-support-beam { position: absolute; z-index: 3; top: calc(var(--eave) - 12px); left: 50%; transform: translateX(-50%); width: min(900px, 86vw); height: 31px; border-radius: 4px; border-top: 2px solid #a57a4b; background: repeating-linear-gradient(2deg, transparent 0 3px, #21140930 4px, transparent 6px 9px), linear-gradient(#795334, #49301e 60%, #302015); box-shadow: inset 0 -3px 4px #24160c, 0 9px 13px #35241355; }
+.jp-support-beam i { position: absolute; top: 7px; left: 12px; width: 8px; height: 8px; border-radius: 50%; background: #241e18; box-shadow: inset 1px 1px 1px #b29468; }
+.jp-support-beam i:last-child { left: auto; right: 12px; }
+.jp-norens { top: calc(var(--eave) + 20px); width: min(900px, 86vw); }
+.jp-noren { overflow: visible; clip-path: none; transform-origin: 50% -20px; }
+.jp-noren::before { content: ''; position: absolute; top: -25px; left: 14%; width: 72%; height: 28px; background: linear-gradient(90deg, #c4ad89 0 11%, transparent 11% 89%, #c4ad89 89% 100%); filter: drop-shadow(2px 1px 1px #37241466); }
+.jp-noren--accent::before { background: linear-gradient(90deg, #9e3022 0 11%, transparent 11% 89%, #9e3022 89% 100%); }
+@keyframes courtyard-cloth { 0%,100% { transform: perspective(900px) rotateX(-2deg); } 40% { transform: perspective(900px) rotateX(6deg); } 70% { transform: perspective(900px) rotateX(1deg); } }

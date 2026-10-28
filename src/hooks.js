@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export function useMedia(query) {
-  const get = () => typeof window !== 'undefined' && window.matchMedia(query).matches
-  const [match, setMatch] = useState(get)
+  const [match, setMatch] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(query).matches : false,
+  )
   useEffect(() => {
     const mq = window.matchMedia(query)
     const on = () => setMatch(mq.matches)
@@ -15,82 +16,49 @@ export function useMedia(query) {
 
 export const useReducedMotion = () => useMedia('(prefers-reduced-motion: reduce)')
 
-// Adds a small amount of entrance rhythm to every route without coupling pages to animation code.
-export function usePageReveal(path) {
+/* One orchestrated entrance per route: panels rise in reading order from an
+   already-visible default, then the class is removed and never replayed. */
+export function useEntrance(path) {
   useEffect(() => {
-    const root = document.getElementById('main')
-    if (!root) return undefined
-    const nodes = root.querySelectorAll(
-      'main > header, main > section, main > .wrap, main > .wrap > article, main > .wrap > section, main > .wrap > ol',
-    )
+    const nodes = document.querySelectorAll('[data-rise]')
     if (!nodes.length) return undefined
 
-    nodes.forEach((node, index) => {
-      node.classList.add('reveal-target')
-      node.style.setProperty('--reveal-delay', `${Math.min(index * 55, 275)}ms`)
-    })
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-      nodes.forEach((node) => node.classList.add('is-revealed'))
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      !('IntersectionObserver' in window)
+    ) {
+      nodes.forEach((n) => n.classList.add('rise', 'is-in'))
       return undefined
     }
 
-    const observer = new IntersectionObserver(
+    nodes.forEach((n) => n.classList.add('rise'))
+    const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return
-          entry.target.classList.add('is-revealed')
-          observer.unobserve(entry.target)
-        })
+        entries
+          .filter((e) => e.isIntersecting)
+          .forEach((e, i) => {
+            e.target.style.setProperty('--rise-delay', `${Math.min(i * 70, 280)}ms`)
+            e.target.classList.add('is-in')
+            io.unobserve(e.target)
+          })
       },
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.04 },
     )
-    nodes.forEach((node) => observer.observe(node))
-    return () => observer.disconnect()
+    nodes.forEach((n) => io.observe(n))
+    return () => io.disconnect()
   }, [path])
 }
 
-// Adds `is-drawn` once the element is 35% visible. Used by the line-draw drawings.
-export function useDrawn() {
-  const ref = useRef(null)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    if (!('IntersectionObserver' in window)) {
-      el.classList.add('is-drawn')
-      return
-    }
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add('is-drawn')
-          io.disconnect()
-        }
-      },
-      { threshold: 0.35 },
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-  return ref
-}
-
-// Tracks which element id is nearest the top of the viewport.
-export function useActiveSection(ids) {
-  const [active, setActive] = useState(ids[0])
-  useEffect(() => {
-    const els = ids.map((id) => document.getElementById(id)).filter(Boolean)
-    if (!els.length) return
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive(e.target.id)
-        })
-      },
-      { rootMargin: '-30% 0px -60% 0px' },
-    )
-    els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
-  }, [ids])
-  return active
+/* True when the object should be drawn as the SVG twin rather than in WebGL:
+   a coarse pointer, a narrow viewport, or a stated motion preference. Decided
+   once on mount so the object and its caption can never disagree. */
+export function useLiteObject() {
+  const [lite] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(hover: none)').matches ||
+        window.matchMedia('(max-width: 820px)').matches ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches),
+  )
+  return lite
 }

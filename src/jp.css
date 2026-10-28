@@ -1,0 +1,547 @@
+/* ===========================================================================
+   THE JAPANESE WORLD
+   Scoped to .jp so it cannot reach the routes still in the cream-and-ink
+   system. Off-white plaster, sumi ink, vermilion, and lacquered wood.
+   Palette sampled from design-source/Hero.png and IdealHero.png.
+   =========================================================================== */
+
+.jp {
+  --paper: #f3efe9;
+  --wall: #e5dfdb;
+  --rice: #efe9df;
+  --sumi: #16150f;
+  --sumi-2: #45413a;
+  --sumi-3: #6d675e;
+  --tile: #2b2926;
+  --lacquer: #1d1a16;
+  --lacquer-hi: #322d26;
+  --wood: #6e5438;
+  --wood-dk: #46341f;
+  --vermilion: #d1452f;
+  --vermilion-dk: #ae3524;
+  --lavender: #d5d9ea;
+
+  --jp-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  background: var(--paper);
+  color: var(--sumi);
+}
+
+/* The rim's thickness, and therefore the tray's whole sense of being an
+   object, is one number. */
+.jp-tray {
+  --rim: clamp(14px, 1.5vw, 22px);
+  --wall-w: clamp(8px, 0.9vw, 13px);
+}
+
+/* ---------------------------------------------------------------- section */
+
+.jp-section {
+  padding-block: clamp(72px, 9vw, 150px);
+  padding-inline: clamp(16px, 4vw, 56px);
+  background: var(--paper);
+  position: relative;
+}
+
+/* A faint plaster tooth, so the backdrop reads as paper rather than as #fff. */
+.jp-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: radial-gradient(circle at 20% 30%, rgb(0 0 0 / 0.018) 0 1px, transparent 1px),
+    radial-gradient(circle at 70% 65%, rgb(0 0 0 / 0.014) 0 1px, transparent 1px);
+  background-size: 23px 23px, 31px 31px;
+}
+
+.jp-head {
+  max-width: 1180px;
+  margin-inline: auto;
+  margin-bottom: clamp(34px, 4.5vw, 66px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.jp-title {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-variation-settings: 'wdth' 90;
+  font-size: clamp(1.85rem, 4.2vw, 3.35rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.jp-sub {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sumi-3);
+  margin: 0;
+  padding-bottom: 0.4em;
+}
+
+/* ------------------------------------------------------------------- tray */
+
+.jp-tray-wrap {
+  max-width: 1180px;
+  margin-inline: auto;
+  perspective: 1600px;
+  perspective-origin: 50% 0%;
+  position: relative;
+  --pull-y: 220px;
+  --pull-scale: 0.94;
+  --pull-tilt: 7deg;
+  transform: translateY(var(--pull-y)) rotateX(var(--pull-tilt)) scale(var(--pull-scale));
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.jp-tray {
+  position: relative;
+  transform-style: preserve-3d;
+  border-radius: 18px;
+  padding: var(--rim);
+  background: var(--lacquer);
+  /* The outer wall, built from stacked rims rather than one flat border, so
+     the box has real thickness under the light. */
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.1),
+    inset 0 -3px 0 rgb(0 0 0 / 0.55),
+    0 2px 0 var(--wood-dk),
+    0 5px 0 #2f2314,
+    0 8px 0 #241a0f,
+    0 14px 22px rgb(31 23 12 / 0.3),
+    0 36px 60px rgb(31 23 12 / 0.26);
+}
+
+/* Lacquer sheen: a material property of the rim, not decoration. */
+.jp-tray::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(161deg, rgb(255 255 255 / 0.1) 0%, transparent 34%, transparent 70%, rgb(0 0 0 / 0.22) 100%);
+}
+
+/* The inner well the compartments are cut into. */
+.jp-tray-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: var(--wall-w);
+  background: var(--lacquer-hi);
+  border-radius: 7px;
+  padding: var(--wall-w);
+  box-shadow:
+    inset 0 3px 7px rgb(0 0 0 / 0.6),
+    inset 0 -1px 0 rgb(255 255 255 / 0.06);
+  min-height: clamp(360px, 46vw, 560px);
+}
+
+/* ------------------------------------------------------------ compartment */
+
+.jp-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--rice);
+  color: var(--sumi);
+  text-decoration: none;
+  isolation: isolate;
+  /* The inner wall each compartment is sunk behind. */
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.3),
+    inset 0 4px 9px rgb(0 0 0 / 0.26),
+    inset 0 -2px 5px rgb(0 0 0 / 0.14);
+  transition:
+    transform 0.5s var(--jp-ease),
+    box-shadow 0.5s var(--jp-ease);
+}
+
+.jp-cell--lead {
+  grid-row: span 2;
+}
+
+.jp-cell--vermilion {
+  background: var(--vermilion);
+  color: #fff;
+}
+.jp-cell--lavender {
+  background: var(--lavender);
+}
+.jp-cell--sumi {
+  background: #15140f;
+  color: var(--rice);
+}
+
+/* The food sits proud of the compartment when you reach for it. */
+@media (hover: hover) {
+  .jp-cell:hover,
+  .jp-cell:focus-visible {
+    transform: translateY(-5px);
+    box-shadow:
+      inset 0 0 0 1px rgb(0 0 0 / 0.22),
+      inset 0 2px 5px rgb(0 0 0 / 0.14),
+      0 10px 20px rgb(20 14 6 / 0.38);
+  }
+}
+
+.jp-cell:focus-visible {
+  outline: 3px solid var(--vermilion);
+  outline-offset: -3px;
+}
+.jp-cell--vermilion:focus-visible {
+  outline-color: #fff;
+}
+
+.jp-cell-body {
+  position: relative;
+  z-index: 2;
+  padding: clamp(16px, 1.7vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  pointer-events: none;
+}
+
+.jp-index {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  opacity: 0.62;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.jp-index::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+  max-width: 44px;
+}
+
+.jp-name {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-variation-settings: 'wdth' 95;
+  font-size: clamp(1.25rem, 2.3vw, 2.05rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.jp-cell--sub .jp-name {
+  font-size: clamp(1.05rem, 1.6vw, 1.4rem);
+}
+
+.jp-role {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  opacity: 0.82;
+  max-width: 34ch;
+  margin: 0;
+}
+
+.jp-meta {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.jp-meta span {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 3px 8px 2px;
+  opacity: 0.72;
+}
+
+/* ------------------------------------------------------------------ media */
+
+.jp-media {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.jp-media img,
+.jp-media video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.9s var(--jp-ease), opacity 0.5s var(--jp-ease);
+}
+
+/* The lead compartment keeps its media low and angled so the headline above
+   it stays readable without a scrim over the whole picture. */
+.jp-cell--sub .jp-media {
+  inset: auto -8% -12% 50%;
+  height: 64%;
+  border-top-left-radius: 8px;
+  box-shadow: -8px -8px 22px rgb(0 0 0 / 0.2);
+}
+
+.jp-cell--sub .jp-cell-body {
+  max-width: 50%;
+}
+
+@media (hover: hover) {
+  .jp-cell--sub:hover .jp-media img {
+    transform: scale(1.05) translateY(-5px);
+  }
+}
+
+.jp-cell--lead .jp-media {
+  inset: 42% -8% -14% 14%;
+  border-top-left-radius: 8px;
+  box-shadow: -10px -10px 26px rgb(0 0 0 / 0.26);
+}
+.jp-cell--lead .jp-media img,
+.jp-cell--lead .jp-media video {
+  object-position: left top;
+  transform: scale(1.02);
+}
+
+@media (hover: hover) {
+  .jp-cell--lead:hover .jp-media img,
+  .jp-cell--lead:hover .jp-media video {
+    transform: scale(1.055) translateY(-7px);
+  }
+}
+
+.jp-cell--lead .jp-video {
+  opacity: 0;
+}
+.jp-cell--lead[data-playing='true'] .jp-video {
+  opacity: 1;
+}
+.jp-cell--lead[data-playing='true'] .jp-poster {
+  opacity: 0;
+}
+
+/* A quiet mark that there is something to play, replaced by the video. */
+.jp-play {
+  position: absolute;
+  z-index: 3;
+  right: clamp(14px, 1.6vw, 22px);
+  bottom: clamp(14px, 1.6vw, 22px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 11px 5px;
+  transition: opacity 0.4s var(--jp-ease);
+  pointer-events: none;
+}
+.jp-cell[data-playing='true'] .jp-play {
+  opacity: 0;
+}
+
+/* Spisnem: the queue number ticks down while the compartment is active. */
+.jp-queue {
+  position: absolute;
+  z-index: 2;
+  right: clamp(12px, 1.4vw, 20px);
+  top: clamp(12px, 1.4vw, 20px);
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--sumi);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.2);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.04em;
+}
+
+.jp-queue small {
+  position: absolute;
+  bottom: 7px;
+  font-size: 0.42rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
+/* MinWin: the bar trims itself down while the compartment is active. */
+.jp-trim {
+  position: absolute;
+  z-index: 2;
+  left: clamp(16px, 1.7vw, 26px);
+  right: clamp(16px, 1.7vw, 26px);
+  bottom: clamp(14px, 1.6vw, 22px);
+  display: grid;
+  gap: 5px;
+}
+
+/* The chips keep clear of the bars underneath them. */
+.jp-cell--sumi .jp-cell-body {
+  padding-bottom: calc(clamp(14px, 1.6vw, 22px) + 52px);
+}
+
+.jp-trim-row {
+  height: 7px;
+  background: rgb(255 255 255 / 0.13);
+  position: relative;
+  overflow: hidden;
+}
+
+.jp-trim-row::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--vermilion);
+  transform-origin: left;
+  transform: scaleX(var(--w, 0.9));
+  transition: transform 0.8s var(--jp-ease);
+  transition-delay: calc(var(--i) * 70ms);
+}
+
+.jp-cell--sumi[data-active='true'] .jp-trim-row::after {
+  transform: scaleX(var(--trim, 0.35));
+}
+
+/* The last few pixels land with a soft, short bounce. */
+.jp-tray.is-landed { animation: jp-tray-plop 620ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes jp-tray-plop {
+  0% { transform: translateY(-15px) scale(1.012, 0.988); }
+  45% { transform: translateY(7px) scale(1.02, 0.972); }
+  72% { transform: translateY(-3px) scale(0.996, 1.006); }
+  100% { transform: none; }
+}
+
+/* -------------------------------------------------------------- responsive */
+
+@media (max-width: 860px) {
+  /* The lunchbox stands up: one column of compartments inside the same tray,
+     at full legibility rather than three shrunken wells. */
+  .jp-tray-inner {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    min-height: 0;
+  }
+  .jp-cell--lead {
+    grid-row: auto;
+    min-height: 330px;
+  }
+  .jp-cell--sub {
+    min-height: 215px;
+  }
+  .jp-cell--lead .jp-media {
+    inset: 54% -6% -10% 8%;
+  }
+  .jp-cell--lead .jp-cell-body {
+    padding-bottom: 0;
+  }
+  .jp-cell--sub .jp-cell-body {
+    max-width: 58%;
+  }
+  .jp-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .jp-tray {
+    --rim: 11px;
+    --wall-w: 7px;
+  }
+  .jp-queue {
+    width: 46px;
+    height: 46px;
+    font-size: 0.9rem;
+  }
+}
+
+/* --------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .jp-tray-wrap { transform: none !important; }
+  .jp-tray.is-landed { animation: none; }
+  .jp-media img,
+  .jp-media video,
+  .jp-cell,
+  .jp-trim-row::after {
+    transition: none !important;
+  }
+}
+
+/* Selected work: one wooden tray in the same courtyard as the roof. */
+.jp-bento-scene { position: relative; isolation: isolate; min-height: 900px; padding: clamp(70px, 9vw, 120px) clamp(20px, 4vw, 70px) 100px; overflow: hidden; background: radial-gradient(ellipse at 72% 15%, #f1e6d7 0%, transparent 62%), linear-gradient(115deg, #baaa97, #e2d5c3 55%, #b5a28c); color: #17130f; }
+.jp-bento-scene-shadow { position: absolute; inset: -15%; z-index: -1; opacity: .18; filter: blur(24px); background: repeating-conic-gradient(from 18deg at 80% 0%, transparent 0deg 16deg, #4c4131 18deg 21deg, transparent 23deg 42deg); transform: rotate(1deg); }
+.jp-bento-heading { max-width: 1450px; min-height: 200px; margin: 0 auto 24px; display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center; gap: 20px; font-family: var(--font-mono); }
+.jp-bento-side { justify-self: start; align-self: center; font-size: .62rem; line-height: 1.85; letter-spacing: .16em; }
+.jp-bento-side i { display: block; width: 22px; height: 1px; background: currentColor; margin: 16px 0 24px; }
+.jp-bento-heading-main { text-align: center; }
+.jp-bento-kanji { display: block; color: var(--vermilion); font-size: 1.4rem; margin-bottom: 14px; }
+.jp-bento-heading-main h2 { margin: 0; font-size: clamp(1.3rem, 2vw, 1.85rem); font-weight: 400; letter-spacing: .32em; }
+.jp-bento-heading-main i { display: block; width: 58px; height: 1px; background: #6b5847; margin: 18px auto; }
+.jp-bento-heading-main p { margin: 0; font-size: .68rem; line-height: 1.45; letter-spacing: .14em; }
+.jp-bento-view { justify-self: end; display: flex; align-items: center; gap: 16px; color: inherit; font-size: .65rem; line-height: 1.6; letter-spacing: .08em; text-decoration: none; }
+.jp-bento-view span { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid currentColor; border-radius: 50%; font-size: 1.5rem; transition: transform .25s ease; }
+.jp-bento-view:hover span, .jp-bento-view:focus-visible span { transform: translate(3px,-3px); }
+.jp-bento-tray { --bento-rise: 260px; --bento-scale: .9; --bento-tilt: 8deg; position: relative; max-width: 1450px; height: clamp(420px, 34vw, 520px); margin: 0 auto; padding: 12px 13px 34px; border-radius: 44px 44px 54px 54px; background: linear-gradient(100deg, #351c10 0%, #8d5130 2%, #be7a45 5%, #563019 13%, #3e2114 65%, #aa663e 95%, #30170e 100%); box-shadow: inset 0 5px 4px #f7b5789c, inset 0 -10px 10px #241107a8, 0 6px 0 #5b2f1c, 0 16px 0 #4b2517, 0 22px 0 #30190f, 0 30px 18px #28160d72, 0 50px 52px #28160d55; transform: translateY(var(--bento-rise)) perspective(1400px) rotateX(var(--bento-tilt)) scale(var(--bento-scale)); transform-origin: 50% 90%; will-change: transform; }
+.jp-bento-tray::after { content: ''; position: absolute; left: 2%; right: 2%; bottom: 0; height: 29px; border-radius: 0 0 40px 40px; background: repeating-linear-gradient(0deg, transparent 0 3px, #130b0633 4px 5px), linear-gradient(#7a472c, #452415); box-shadow: inset 0 2px 3px #efaa6b66; pointer-events: none; }
+.jp-bento-tray-inner { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; height: 100%; padding: 10px; border-radius: 32px; background: #29160f; box-shadow: inset 0 7px 9px #120804; }
+.jp-bento-card { position: relative; display: flex; flex-direction: column; overflow: hidden; min-width: 0; padding: clamp(18px,2.2vw,34px); border-radius: 24px; color: #141210; text-decoration: none; box-shadow: inset 0 0 0 2px #1d0f0b99, inset 0 4px 10px #2c120f33; transition: transform .3s ease, filter .3s ease; }
+.jp-bento-card:hover, .jp-bento-card:focus-visible { transform: translateY(-5px); filter: brightness(1.04); }
+.jp-bento-card:focus-visible { outline: 3px solid #fff; outline-offset: -5px; }
+.jp-bento-card--applyer { background: radial-gradient(circle at 85% 80%, #96b29e 0 19%, transparent 20%), linear-gradient(130deg,#f4ede5,#d9c9b9); }
+.jp-bento-card--spisnem { background: radial-gradient(circle at 85% 85%, #b85f46 0 28%, transparent 29%), linear-gradient(135deg,#f4d1b8,#cb967c); }
+.jp-bento-card--creative { color: #fff; background: radial-gradient(circle at 100% 100%, #553477, transparent 45%), linear-gradient(145deg,#191719,#0d0d10 70%); }
+.jp-bento-number { position: relative; z-index: 2; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .08em; }
+.jp-bento-arrow { position: absolute; z-index: 2; top: 17px; right: 22px; font-family: var(--font-mono); font-size: 2rem; font-weight: 200; line-height: 1; }
+.jp-bento-card h3 { position: relative; z-index: 2; margin: 18px 0 12px; font-family: var(--font-mono); font-size: clamp(1.25rem,2.1vw,2rem); line-height: 1; letter-spacing: -.04em; }
+.jp-bento-card p { position: relative; z-index: 2; max-width: 22ch; margin: 0; font-family: var(--font-mono); font-size: clamp(.6rem,.85vw,.78rem); line-height: 1.5; letter-spacing: .03em; }
+.jp-bento-tags { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
+.jp-bento-tags span { padding: 4px 8px 3px; border: 1px solid currentColor; border-radius: 4px; font-family: var(--font-mono); font-size: .52rem; letter-spacing: .04em; opacity: .8; }
+.jp-bento-image { position: absolute; z-index: 1; width: 110%; height: 58%; object-fit: cover; object-position: left top; bottom: -10%; left: 9%; transform: rotate(-8deg); border: 6px solid #f9f8f5; border-radius: 14px; box-shadow: -12px -13px 25px #25160f55; }
+.jp-bento-card--spisnem .jp-bento-image { width: 85%; height: 58%; left: 23%; bottom: -10%; transform: rotate(-9deg); border-radius: 24px; }
+.jp-bento-creative-art { position: absolute; bottom: -1%; left: 3%; width: 105%; height: 51%; border: 7px solid #17131c; border-radius: 12px; background: radial-gradient(circle at 75% 38%, #bd4088 0 7%, transparent 26%), radial-gradient(circle at 67% 30%, #7254a0 0 15%, transparent 42%), linear-gradient(160deg,#161b30,#4b2449 80%); box-shadow: -8px -10px 25px #0008; transform: rotate(-4deg); }
+.jp-bento-creative-art::before { content: 'CreativeHub   /   VISUAL EDITOR'; position: absolute; inset: 0 0 auto; height: 27px; padding: 8px; background: #100f17; color: #ddd; font: 9px var(--font-mono); letter-spacing: .08em; }
+.jp-bento-play { position: absolute; top: 40%; left: 50%; translate: -50% -50%; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: #fff8; color: #171019; }
+.jp-bento-artbar { position: absolute; bottom: 9px; left: 8%; width: 84%; height: 20px; background: repeating-linear-gradient(90deg,#76305b 0 50px,#2c2249 52px 99px); border-radius: 4px; }
+.jp-bento-tray.is-landed { animation: jp-bento-plop 620ms ease-out both; }
+@keyframes jp-bento-plop { 0% { transform: translateY(-11px) scale(1.006,.99); } 45% { transform: translateY(7px) scale(1.012,.978); } 72% { transform: translateY(-3px) scale(.997,1.005); } 100% { transform: none; } }
+.jp-bento-next { display: block; text-align: center; margin-top: 85px; font-family: var(--font-mono); font-size: 1.5rem; color: #fbf4ea; }
+@media (max-width: 860px) { .jp-bento-scene { min-height: auto; padding: 65px 16px 90px; } .jp-bento-heading { grid-template-columns: 1fr auto; min-height: 170px; } .jp-bento-side { display: none; } .jp-bento-heading-main { text-align: left; } .jp-bento-heading-main i { margin-left: 0; } .jp-bento-heading-main p br { display: none; } .jp-bento-tray { height: auto; padding: 10px 10px 30px; } .jp-bento-tray-inner { grid-template-columns: 1fr; } .jp-bento-card { min-height: 310px; } .jp-bento-image { height: 55%; width: 70%; left: 35%; } .jp-bento-next { margin-top: 65px; } }
+@media (max-width: 560px) { .jp-bento-heading { display: block; min-height: 180px; } .jp-bento-heading-main { text-align: center; } .jp-bento-heading-main i { margin-inline: auto; } .jp-bento-view { justify-content: center; margin-top: 20px; } .jp-bento-card { min-height: 260px; } .jp-bento-image { width: 70%; height: 58%; } }
+@media (prefers-reduced-motion: reduce) { .jp-bento-tray { transform: none !important; } .jp-bento-tray.is-landed { animation: none; } }

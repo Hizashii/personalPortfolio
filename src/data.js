@@ -14,15 +14,30 @@ export const SOCIALS = {
   cv: '/CV/WorkingCV.pdf',
 }
 
-export const NAV = [
-  { to: '/', label: 'Home' },
-  { to: '/work', label: 'Work' },
-  { to: '/experience', label: 'Experience' },
-  { to: '/lab', label: 'Lab & Notes' },
-  { to: '/about', label: 'About' },
+export const ROUTES = [
+  { num: '01', label: 'Work', to: '/work' },
+  { num: '02', label: 'About', to: '/about' },
+  { num: '03', label: 'CV', to: '/cv' },
+  { num: '04', label: 'Lab', to: '/lab' },
 ]
 
 // lit = fully covered layers, partial = in progress (drawn dashed)
+export const PROJECT_RIG = {
+  applyer: {
+    rig: 'deal',
+    label:
+      'A deck of roles. One card lifts off the pile, crosses and lands on the applied pile, over and over.',
+  },
+  spisnem: {
+    rig: 'queue',
+    label: 'A line of parties shuffling toward the door. The front one is called in; a new one joins the back.',
+  },
+  minwin: {
+    rig: 'strip',
+    label: 'A machine being trimmed. Each layer loses its offcuts and settles to a lean core, then rebuilds.',
+  },
+}
+
 export const PROJECTS = {
   applyer: {
     slug: 'applyer',
@@ -201,3 +216,185 @@ export const HOME_CONTENT = {
     ['2022 to 2023', 'Support engineer', 'Microsoft 365 and Cisco', 'Enterprise troubleshooting, which taught me to read systems I had not built.'],
   ],
 }
+
+/* ---------------------------------------------------------------------------
+   The six-layer stack. Shared grammar: every project lights the span it
+   covers, every role lights the span it touched. Slab footprints vary so the
+   object keeps a silhouette; colours avoid blue because the hero field is blue.
+   --------------------------------------------------------------------------- */
+
+export const LAYER_META = [
+  {
+    key: 'interface',
+    name: 'Interface',
+    color: '#ff674d',
+    w: 1.62,
+    d: 1.62,
+    h: 0.2,
+    note: 'What a person actually touches. Angular, React, Next.js.',
+  },
+  {
+    key: 'application',
+    name: 'Application',
+    color: '#e9fe6a',
+    w: 1.78,
+    d: 1.5,
+    h: 0.26,
+    note: 'Flows, state, permissions, the rules that decide what happens.',
+  },
+  {
+    key: 'backend',
+    name: 'Backend',
+    color: '#fffdf8',
+    w: 1.52,
+    d: 1.76,
+    h: 0.3,
+    note: 'APIs, data, jobs. Node, NestJS, Postgres, Supabase, DuckDB.',
+  },
+  {
+    key: 'infrastructure',
+    name: 'Infrastructure',
+    color: '#f7dbca',
+    w: 1.86,
+    d: 1.6,
+    h: 0.24,
+    note: 'Where it runs and how it recovers. Docker, Terraform, Ansible.',
+  },
+  {
+    key: 'system',
+    name: 'System',
+    color: '#dfe1ff',
+    w: 1.58,
+    d: 1.84,
+    h: 0.28,
+    note: 'The machine underneath. Rust, Win32, benchmarks, resource cost.',
+  },
+  {
+    key: 'business',
+    name: 'Business',
+    color: '#17191f',
+    w: 1.7,
+    d: 1.56,
+    h: 0.22,
+    note: 'Why the thing should exist, and what it costs to keep alive.',
+  },
+]
+
+/* Roles as running processes. `layers` indexes LAYER_META; `partial` is work
+   still in progress. `running` drives the live indicator. */
+export const CV_LOG = [
+  {
+    id: 'weblager',
+    org: 'Weblager',
+    role: 'Full-stack engineer',
+    when: 'Apr 2026 to present',
+    running: true,
+    stack: ['Angular', 'TypeScript', 'RxJS', 'PrimeNG'],
+    layers: [0, 1, 2],
+    partial: [5],
+    line: 'Complex search, permissions and archive access on a large application.',
+    detail: [
+      'Complex search and filtering behaviour across large data sets.',
+      'Permissions, role-based access, clearance logic and archive access.',
+      'State synchronisation, data mapping, forms and workflows, with edge cases across long application flows.',
+      'Tracing issues from the interface down into API behaviour.',
+    ],
+  },
+  {
+    id: 'applyer',
+    org: 'Applyer',
+    role: 'Founding engineer',
+    when: '2026 to present',
+    running: true,
+    stack: ['TypeScript', 'Supabase', 'Docker', 'Terraform'],
+    layers: [0, 1, 2, 3],
+    partial: [4, 5],
+    line: 'Built across the whole product, from first commit to deployment.',
+    detail: [
+      'Interface, authentication and onboarding.',
+      'API, backend and data, including job matching and generated application material.',
+      'Application workflow and browser automation.',
+      'Infrastructure, deployment and failure handling. Now exploring local models and a controlled agent network.',
+    ],
+  },
+  {
+    id: 'visma',
+    org: 'Visma Creditro',
+    role: 'Full-stack developer',
+    when: 'Dec 2024 to Jan 2026',
+    running: false,
+    stack: ['Vue', 'NestJS', 'Node.js', 'Redis'],
+    layers: [0, 1, 2],
+    partial: [3],
+    line: 'Moved caching to Redis: about 2.2× faster cached workflows in internal benchmarks.',
+    detail: [
+      'Worked across multiple microservices and debugged behaviour between them.',
+      'OCR and document extraction work.',
+      'Internal metrics and observability.',
+      'Localisation for Sweden, Norway and Finland, shipped across the stack.',
+    ],
+  },
+  {
+    id: 'holdbox',
+    org: 'Holdbox',
+    role: 'Full-stack engineer, internship',
+    when: 'Jan to Mar 2025',
+    running: false,
+    stack: ['Next.js', 'Node.js', 'MongoDB'],
+    layers: [0, 1, 2],
+    partial: [],
+    line: 'Customer-facing e-commerce and admin functionality for a catalogue of 1,000+ products.',
+    detail: [
+      'Shipped both the customer experience and the internal admin workflows.',
+      'Catalogue, product data and order handling.',
+    ],
+  },
+  {
+    id: 'microsoft',
+    org: 'Microsoft',
+    role: 'Support engineer, Microsoft 365',
+    when: 'Apr to Sep 2023',
+    running: false,
+    stack: ['Azure', 'PowerShell', 'SharePoint'],
+    layers: [3, 4],
+    partial: [5],
+    line: 'Enterprise environments across Azure and Commerce. Reading systems I did not build.',
+    detail: [
+      'Troubleshooting with CMD and PowerShell.',
+      'Cases for large enterprise customers, including IBM and CERN.',
+      'Moved here straight from Cisco, onto the Microsoft 365 project.',
+    ],
+  },
+  {
+    id: 'cisco',
+    org: 'Cisco',
+    role: 'Support engineer',
+    when: 'Nov 2022 to Apr 2023',
+    running: false,
+    stack: ['Networking', 'Hardware', 'Escalation'],
+    layers: [4],
+    partial: [3],
+    line: 'First professional technical role. Fixing systems before building them.',
+    detail: [
+      'Hardware, account and network troubleshooting over phone, email and chat.',
+      'Documented cases and escalated to the networking teams.',
+    ],
+  },
+]
+
+export const EDUCATION = [
+  {
+    id: 'easv',
+    org: 'Erhvervsakademi Sydvest',
+    role: 'PBA, Web Development',
+    when: '2023 to 2027',
+    line: 'Professional bachelor. Web development and e-business, international.',
+  },
+  {
+    id: 'dccj',
+    org: 'Danish Chamber of Commerce in Japan',
+    role: 'Member',
+    when: 'Feb 2026 to present',
+    line: 'Languages: English, Japanese, Danish (learning).',
+  },
+]

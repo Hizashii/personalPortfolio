@@ -1,88 +1,143 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Link, useRouter } from '../router'
-import { NAV, SOCIALS } from '../data'
-import { Arrow } from './ui'
-import { usePageReveal } from '../hooks'
+import { ROUTES, SOCIALS, TICKER } from '../data'
+import { Arrow, Asterisk, Download } from './ui'
 
-export function CursorLabel() {
-  const ref = useRef(null)
-  useEffect(() => {
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const el = ref.current
-    if (!fine || calm || !el) return undefined
-    const move = (event) => {
-      const hit = event.target.closest?.('[data-cursor]')
-      if (hit) {
-        el.textContent = hit.dataset.cursor
-        el.style.transform = `translate3d(${event.clientX + 16}px, ${event.clientY + 16}px, 0)`
-      }
-      el.classList.toggle('is-on', Boolean(hit))
-    }
-    const leave = () => el.classList.remove('is-on')
-    window.addEventListener('pointermove', move, { passive: true })
-    document.addEventListener('pointerleave', leave)
-    return () => {
-      window.removeEventListener('pointermove', move)
-      document.removeEventListener('pointerleave', leave)
-    }
-  }, [])
-  return <div ref={ref} className="cursor-label" aria-hidden="true" />
-}
+const CASE_PARENT = ['/applyer', '/spisnem', '/minwin']
 
-export function SiteHeader() {
+export function TopBar() {
   const { path } = useRouter()
-  const navRef = useRef(null)
-  const indicatorRef = useRef(null)
-  const active = (to) => (to === '/' ? path === '/' : path === to)
-
-  useLayoutEffect(() => {
-    const link = navRef.current?.querySelector('.is-active')
-    const indicator = indicatorRef.current
-    if (!link || !indicator) return
-    indicator.style.opacity = '1'
-    indicator.style.width = `${link.offsetWidth}px`
-    indicator.style.transform = `translateX(${link.offsetLeft}px)`
-  }, [path])
+  const current = CASE_PARENT.includes(path) ? '/work' : path
 
   return (
-    <header className="ibar">
-      <div className="ibar-inner wrap">
-        <Link to="/" className="ibar-brand" aria-label="Lachezar Dimchov, home">
-          <span className="ibar-mark" aria-hidden="true">LD</span>
-          <span className="ibar-name">Lachezar Dimchov</span>
+    <header className="bar">
+      <div className="board flex items-center gap-4 w-full">
+        <Link to="/" className="bar-mark" aria-label="Lachezar Dimchov, home">
+          <span className="bracket bracket-l" aria-hidden="true">
+            [
+          </span>
+          LD
+          <span className="bracket bracket-r" aria-hidden="true">
+            ]
+          </span>
         </Link>
-        <nav className="ibar-nav" aria-label="Main navigation" ref={navRef}>
-          <span className="ibar-ind" ref={indicatorRef} aria-hidden="true" />
-          {NAV.map(({ to, label }) => (
-            <Link key={to} to={to} className={`ibar-link ${active(to) ? 'is-active' : ''}`} aria-current={active(to) ? 'page' : undefined}>
-              {label}
+        <span className="t-micro dimmer hidden lg:inline">
+          Lachezar Dimchov&nbsp; / &nbsp;Full-stack developer
+        </span>
+
+        <nav className="bar-nav" aria-label="Sections">
+          {ROUTES.map((r) => (
+            <Link
+              key={r.to}
+              to={r.to}
+              className="bar-link"
+              aria-current={current === r.to ? 'page' : undefined}
+            >
+              <span className="bar-num">{r.num}</span>
+              <span>{r.label}</span>
             </Link>
           ))}
         </nav>
-        <div className="ibar-actions">
-          <a className="ibar-cv" href={SOCIALS.cv} target="_blank" rel="noopener noreferrer">CV <Arrow dir="down" /></a>
-          <Link className="btn btn--solid btn--sm" to="/#contact">Say hello <Arrow /></Link>
-        </div>
+
+        <a className="pill" href={`mailto:${SOCIALS.email}`}>
+          Contact
+        </a>
       </div>
     </header>
   )
 }
 
-export function SiteFooter() {
-  return <footer className="foot wrap"><span className="mono">L. Dimchov · Esbjerg · 2026</span><span>Thanks for reading.</span></footer>
-}
-
-export function SiteFrame({ children }) {
-  const { path } = useRouter()
-  usePageReveal(path)
+export function Ticker({ items = TICKER }) {
+  const group = (
+    <div className="ticker-group" aria-hidden="true">
+      {items.map((t) => (
+        <span key={t} className="ticker-item t-label">
+          <Asterisk />
+          {t}
+        </span>
+      ))}
+    </div>
+  )
 
   return (
-    <>
-      <a className="skip" href="#main">Skip to content</a>
-      <SiteHeader />
-      <div id="main">{children}</div>
-      <SiteFooter />
-    </>
+    <div className="ticker">
+      <div className="ticker-track">
+        {group}
+        {group}
+      </div>
+      <span className="sr-only">{items.join('. ')}.</span>
+    </div>
   )
+}
+
+export function SiteFooter() {
+  return (
+    <footer className="section board pb-[clamp(28px,4vw,56px)]">
+      <div className="panel panel--ink">
+        <div className="grid gap-x-10 gap-y-9 md:grid-cols-[1.3fr_1fr_1fr]">
+          <div>
+            <p className="t-display" style={{ fontSize: 'clamp(1.7rem,3.2vw,2.6rem)' }}>
+              Let&rsquo;s build
+              <br />
+              something.
+            </p>
+            <p className="t-lede sub mt-6">
+              Open to full-stack roles in Copenhagen, on site or hybrid, and to freelance work.
+            </p>
+            <a className="btn btn--lime mt-6" href={`mailto:${SOCIALS.email}`}>
+              Write to me
+              <Arrow className="btn-arrow" />
+            </a>
+          </div>
+
+          <div>
+            <h2 className="t-label sub">Elsewhere</h2>
+            <ul className="mt-4 flex flex-col gap-3 t-data">
+              <li>
+                <a className="tlink" href={SOCIALS.github} target="_blank" rel="noreferrer">
+                  GitHub
+                  <Arrow size={12} />
+                </a>
+              </li>
+              <li>
+                <a className="tlink" href={SOCIALS.linkedin} target="_blank" rel="noreferrer">
+                  LinkedIn
+                  <Arrow size={12} />
+                </a>
+              </li>
+              <li>
+                <a className="tlink" href={SOCIALS.cv} download>
+                  CV, PDF
+                  <Download size={12} />
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="t-label sub">Index</h2>
+            <ul className="mt-4 flex flex-col gap-3 t-data">
+              {ROUTES.map((r) => (
+                <li key={r.to}>
+                  <Link className="tlink" to={r.to}>
+                    <span className="opacity-60 tabular-nums">{r.num}</span>
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-10 pt-5 border-t-2 border-current/25 flex flex-wrap gap-x-8 gap-y-2 justify-between t-micro sub">
+          <span>Esbjerg, Denmark &nbsp;/&nbsp; open to Copenhagen, on site or hybrid</span>
+          <span>Built from scratch: React, Vite, WebGL</span>
+          <span>&copy; {new Date().getFullYear()} Lachezar Dimchov</span>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+export function Page({ children }) {
+  return <main id="main">{children}</main>
 }
