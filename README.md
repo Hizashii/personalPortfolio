@@ -1,26 +1,34 @@
-My Developer Portfolio
+# Developer Portfolio
 
-A minimal, animated portfolio built with React, GSAP, and TailwindCSS.
-Showcases my work, my style, and the things I enjoy building.
+My personal frontend portfolio project, built with **React, Vite, Tailwind CSS and Three.js**.
 
-Features
+This repository contains the site implementation. The visual direction is based on strong typography, responsive layouts and controlled interactive elements.
 
-⚡ Smooth GSAP animations
+## Tech stack
 
-🎨 Modern, dark UI
+- React 19
+- Vite 7
+- Tailwind CSS 4
+- Three.js
+- Archivo and Martian Mono variable fonts
 
-⛩️ Japanese-inspired touches
+## Local development
 
-🧩 Reusable, clean components
+```bash
+npm install
+npm run dev
+```
 
-📱 Fully responsive
+## Build and check
 
-Tech Stack
+```bash
+npm run build
+npm run lint
+npm run preview
+```
 
-React
+## Project status
 
-Vite
+**Work in progress.** Design, performance and project presentation are still being refined. Features and animations may change before the final launch.
 
-TailwindCSS
-
-GSAP (ScrollTrigger, timelines)
+For a concise overview of my engineering experience and other repositories, see my [GitHub profile](https://github.com/Hizashii).
